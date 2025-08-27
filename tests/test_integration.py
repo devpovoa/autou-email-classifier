@@ -48,12 +48,12 @@ class TestUploadIntegration:
             patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
         ):
 
-            # Mock das respostas da IA
+            # Mock das respostas da IA (deve corresponder ao DummyAIProvider)
             mock_classify.return_value = {
                 "category": "Produtivo",
-                "confidence": 0.85,
-                "rationale": "Solicitação de suporte técnico",
-                "meta": {"model": "test", "cost": 0.001, "fallback": False},
+                "confidence": 0.97,  # Mesmo valor do DummyAIProvider
+                "rationale": "Texto mockado para testes",
+                "meta": {"model": "mock-gpt-4o-mini", "cost": 0.0, "fallback": False},
             }
             mock_reply.return_value = "Recebemos sua solicitação de suporte..."
 
@@ -65,7 +65,7 @@ class TestUploadIntegration:
             if response.status_code == 200:
                 result = response.json()
                 assert result["category"] == "Produtivo"
-                assert result["confidence"] == 0.8  # Mock AI provider returns 0.8
+                assert result["confidence"] == 0.97  # Valor do DummyAIProvider
                 assert "reply" in result
                 assert "latency_ms" in result
 
@@ -120,12 +120,12 @@ class TestFullWorkflowIntegration:
     @patch("app.services.ai.ai_provider.generate_reply")
     def test_complete_productive_email_workflow(self, mock_reply, mock_classify):
         """Testa fluxo completo para email produtivo"""
-        # Setup mocks
+        # Setup mocks (deve corresponder ao DummyAIProvider)
         mock_classify.return_value = {
             "category": "Produtivo",
-            "confidence": 0.85,
-            "rationale": "Contém solicitação de suporte técnico",
-            "meta": {"model": "gpt-4o-mini", "cost": 0.002, "fallback": False},
+            "confidence": 0.97,  # Mesmo valor do DummyAIProvider
+            "rationale": "Texto mockado para testes",
+            "meta": {"model": "mock-gpt-4o-mini", "cost": 0.0, "fallback": False},
         }
         mock_reply.return_value = (
             "Prezado(a),\n\nRecebemos sua solicitação e ela será "

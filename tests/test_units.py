@@ -232,7 +232,10 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_generate_reply_openai_success(self):
         """Testa geração de resposta OpenAI"""
-        with patch("httpx.AsyncClient") as mock_client:
+        with (
+            patch("app.services.ai.settings.openai_api_key", "test_key"),
+            patch("httpx.AsyncClient") as mock_client,
+        ):
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
