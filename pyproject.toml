@@ -1,9 +1,21 @@
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ["py312"]
 include = '\.pyi?$'
-skip-string-normalization = false
-skip-magic-trailing-comma = false
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.venv
+  | build
+  | dist
+  | __pycache__
+  | coverage
+  | htmlcov
+  | uploads
+)/
+'''
 
 [tool.isort]
 profile = "black"

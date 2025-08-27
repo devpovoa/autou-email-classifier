@@ -169,9 +169,7 @@ class TestScalability:
             mock_classify.side_effect = Exception("API Error")
 
             start_time = time.time()
-            response = client.post(
-                "/classify", data={"text": text, "tone": "neutro"}
-            )
+            response = client.post("/classify", data={"text": text, "tone": "neutro"})
             end_time = time.time()
 
             fallback_time = (end_time - start_time) * 1000

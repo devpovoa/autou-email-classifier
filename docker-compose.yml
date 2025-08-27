@@ -78,13 +78,14 @@ services:
       - PATH=/home/app/.local/bin:/usr/local/bin:/usr/bin:/bin
     command: |
       sh -c "
-        pip install --user flake8 black isort &&
+        pip install --user black==24.8.0 isort==5.13.2 flake8==7.1.1 &&
+        export PATH=/home/app/.local/bin:\$PATH &&
         echo '=== Running Black ===' &&
-        ~/.local/bin/black --check app/ tests/ main.py &&
+        /home/app/.local/bin/black --check app/ tests/ main.py &&
         echo '=== Running isort ===' &&
-        ~/.local/bin/isort --profile black --check-only app/ tests/ main.py &&
+        /home/app/.local/bin/isort --profile black --check-only app/ tests/ main.py &&
         echo '=== Running flake8 ===' &&
-        ~/.local/bin/flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503
+        /home/app/.local/bin/flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503
       "
     profiles:
       - lint
