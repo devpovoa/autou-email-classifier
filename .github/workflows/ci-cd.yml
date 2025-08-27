@@ -10,6 +10,11 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  # Versões fixadas para consistência
+  PYTHON_VERSION: '3.12'
+  BLACK_VERSION: '24.8.0'
+  ISORT_VERSION: '5.13.2'
+  FLAKE8_VERSION: '7.1.1'
 
 jobs:
   # Job de Linting e Formatação
@@ -23,19 +28,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Cache pip packages
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-lint-${{ env.BLACK_VERSION }}-${{ env.ISORT_VERSION }}-${{ env.FLAKE8_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-lint-
 
       - name: Install linting dependencies
         run: |
-          pip install "black==24.8.0" "isort==5.13.2" "flake8==7.1.1"
+          python -m pip install --upgrade pip
+          pip install "black==${{ env.BLACK_VERSION }}" "isort==${{ env.ISORT_VERSION }}" "flake8==${{ env.FLAKE8_VERSION }}"
 
       - name: Run Black
         run: black --check --diff app/ tests/ main.py
