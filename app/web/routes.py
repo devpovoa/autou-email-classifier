@@ -328,8 +328,7 @@ async def _extract_text(form_text: Optional[str], file: Optional[UploadFile]) ->
         if len(file_content) > settings.max_file_size:
             raise HTTPException(
                 status_code=400,
-                detail=f"Arquivo muito grande (máximo: {
-                    settings.max_file_size // 1024 // 1024}MB)",
+                detail=f"Arquivo muito grande (máximo: {settings.max_file_size // 1024 // 1024}MB)",
             )
 
         # Process based on file extension
