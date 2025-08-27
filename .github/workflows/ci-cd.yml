@@ -159,12 +159,12 @@ jobs:
       - name: Build services with docker-compose
         run: |
           # Build all services
-          docker-compose build --parallel
+          docker compose build --parallel
           
       - name: Start services with docker-compose
         run: |
           # Start services in background
-          docker-compose up -d app
+          docker compose up -d app
           
       - name: Wait for services to be ready
         run: |
@@ -182,27 +182,27 @@ jobs:
       - name: Run tests with docker-compose
         run: |
           # Run tests using the test profile
-          docker-compose --profile test run --rm test
+          docker compose --profile test run --rm test
           
       - name: Run linting with docker-compose
         run: |
           # Run linting using the lint profile
-          docker-compose --profile lint run --rm lint
+          docker compose --profile lint run --rm lint
           
       - name: Show service logs on failure
         if: failure()
         run: |
           echo "=== App Service Logs ==="
-          docker-compose logs app
+          docker compose logs app
           echo "=== Test Service Logs ==="
-          docker-compose logs test || true
+          docker compose logs test || true
           echo "=== Lint Service Logs ==="
-          docker-compose logs lint || true
+          docker compose logs lint || true
           
       - name: Cleanup
         if: always()
         run: |
-          docker-compose down -v --remove-orphans
+          docker compose down -v --remove-orphans
 
   # Job de Build e Deploy
   build-and-deploy:
