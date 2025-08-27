@@ -2,8 +2,12 @@ import asyncio
 
 import pytest
 
-from app.services.nlp import (clean_text, detect_language, extract_keywords,
-                              preprocess_text)
+from app.services.nlp import (
+    clean_text,
+    detect_language,
+    extract_keywords,
+    preprocess_text,
+)
 
 
 @pytest.mark.asyncio
@@ -48,7 +52,9 @@ def test_preprocess_text():
 def test_extract_keywords():
     """Test keyword extraction"""
     # Test productive text
-    productive_text = "Preciso de suporte para resolver um erro no sistema urgente"
+    productive_text = (
+        "Preciso de suporte para resolver um erro no sistema urgente"
+    )
     keywords = extract_keywords(productive_text)
     assert "suporte" in keywords
     assert "erro" in keywords

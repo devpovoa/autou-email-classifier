@@ -1,7 +1,9 @@
 """
+Performance and load testing for the email classifier
 Testes de performance e carga para o sistema AutoU
 Valida comportamento sob diferentes cargas de trabalho
 """
+
 import asyncio
 import concurrent.futures
 import time
@@ -22,20 +24,24 @@ class TestPerformance:
         """Testa tempo de resposta para classificação única"""
         text = "Preciso de ajuda com problema no sistema"
 
-        with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+        with patch(
+            "app.services.ai.ai_provider.classify"
+        ) as mock_classify, patch(
+            "app.services.ai.ai_provider.generate_reply"
+        ) as mock_reply:
 
             mock_classify.return_value = {
                 "category": "Produtivo",
                 "confidence": 0.8,
                 "rationale": "Solicitação de suporte",
-                "meta": {"model": "test", "cost": 0.001, "fallback": False}
+                "meta": {"model": "test", "cost": 0.001, "fallback": False},
             }
             mock_reply.return_value = "Resposta automática"
 
             start_time = time.time()
             response = client.post(
-                "/classify", data={"text": text, "tone": "neutro"})
+                "/classify", data={"text": text, "tone": "neutro"}
+            )
             end_time = time.time()
 
             response_time = (end_time - start_time) * 1000  # em ms
@@ -52,22 +58,29 @@ class TestPerformance:
         """Testa manipulação de requisições concorrentes"""
         text = "Teste de concorrência"
 
-        with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+        with patch(
+            "app.services.ai.ai_provider.classify"
+        ) as mock_classify, patch(
+            "app.services.ai.ai_provider.generate_reply"
+        ) as mock_reply:
 
             mock_classify.return_value = {
                 "category": "Produtivo",
                 "confidence": 0.8,
                 "rationale": "Teste",
-                "meta": {"model": "test", "cost": 0.001, "fallback": False}
+                "meta": {"model": "test", "cost": 0.001, "fallback": False},
             }
             mock_reply.return_value = "Resposta"
 
             def make_request():
-                return client.post("/classify", data={"text": text, "tone": "neutro"})
+                return client.post(
+                    "/classify", data={"text": text, "tone": "neutro"}
+                )
 
             # Executar 10 requisições concorrentes
-            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=10
+            ) as executor:
                 futures = [executor.submit(make_request) for _ in range(10)]
                 results = [future.result() for future in futures]
 
@@ -80,20 +93,24 @@ class TestPerformance:
         # Texto próximo ao limite (4500 chars)
         large_text = "Este é um texto longo para testar performance. " * 90
 
-        with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+        with patch(
+            "app.services.ai.ai_provider.classify"
+        ) as mock_classify, patch(
+            "app.services.ai.ai_provider.generate_reply"
+        ) as mock_reply:
 
             mock_classify.return_value = {
                 "category": "Produtivo",
                 "confidence": 0.7,
                 "rationale": "Texto longo",
-                "meta": {"model": "test", "cost": 0.005, "fallback": False}
+                "meta": {"model": "test", "cost": 0.005, "fallback": False},
             }
             mock_reply.return_value = "Processado com sucesso"
 
             start_time = time.time()
             response = client.post(
-                "/classify", data={"text": large_text, "tone": "neutro"})
+                "/classify", data={"text": large_text, "tone": "neutro"}
+            )
             end_time = time.time()
 
             processing_time = (end_time - start_time) * 1000
@@ -106,24 +123,32 @@ class TestPerformance:
         """Testa uso de memória com múltiplos arquivos"""
         file_content = "Conteúdo de teste para arquivo " * 100
 
-        with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+        with patch(
+            "app.services.ai.ai_provider.classify"
+        ) as mock_classify, patch(
+            "app.services.ai.ai_provider.generate_reply"
+        ) as mock_reply:
 
             mock_classify.return_value = {
                 "category": "Produtivo",
                 "confidence": 0.8,
                 "rationale": "Arquivo processado",
-                "meta": {"model": "test", "cost": 0.001, "fallback": False}
+                "meta": {"model": "test", "cost": 0.001, "fallback": False},
             }
             mock_reply.return_value = "Arquivo processado"
 
             # Processar 5 arquivos em sequência
             for i in range(5):
                 files = {
-                    "file": (f"test{i}.txt", file_content.encode(), "text/plain")}
-                response = client.post("/classify",
-                                       data={"tone": "neutro"},
-                                       files=files)
+                    "file": (
+                        f"test{i}.txt",
+                        file_content.encode(),
+                        "text/plain",
+                    )
+                }
+                response = client.post(
+                    "/classify", data={"tone": "neutro"}, files=files
+                )
 
                 # Não deve falhar por problemas de memória
                 assert response.status_code in [200, 400, 500]
@@ -134,6 +159,7 @@ class TestScalability:
 
     def test_health_endpoint_under_load(self):
         """Testa endpoint de health sob carga"""
+
         def check_health():
             return client.get("/health")
 
@@ -151,12 +177,13 @@ class TestScalability:
         text = "Problema no sistema preciso suporte urgente"
 
         # Simular falha da IA para forçar uso do fallback
-        with patch('app.services.ai.ai_provider.classify') as mock_classify:
+        with patch("app.services.ai.ai_provider.classify") as mock_classify:
             mock_classify.side_effect = Exception("API Error")
 
             start_time = time.time()
             response = client.post(
-                "/classify", data={"text": text, "tone": "neutro"})
+                "/classify", data={"text": text, "tone": "neutro"}
+            )
             end_time = time.time()
 
             fallback_time = (end_time - start_time) * 1000
@@ -194,25 +221,27 @@ class TestRobustness:
             "Text with special chars: @#$%^&*()",
             "Texto\ncom\nquebras\nde\nlinha",
             "Texto\tcom\ttabs",
-            "Texto com    espaços    extras"
+            "Texto com    espaços    extras",
         ]
 
-        with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+        with patch(
+            "app.services.ai.ai_provider.classify"
+        ) as mock_classify, patch(
+            "app.services.ai.ai_provider.generate_reply"
+        ) as mock_reply:
 
             mock_classify.return_value = {
                 "category": "Produtivo",
                 "confidence": 0.7,
                 "rationale": "Caracteres especiais processados",
-                "meta": {"model": "test", "cost": 0.001, "fallback": False}
+                "meta": {"model": "test", "cost": 0.001, "fallback": False},
             }
             mock_reply.return_value = "Processado"
 
             for special_text in special_texts:
-                response = client.post("/classify", data={
-                    "text": special_text,
-                    "tone": "neutro"
-                })
+                response = client.post(
+                    "/classify", data={"text": special_text, "tone": "neutro"}
+                )
 
                 # Deve processar sem erros
                 assert response.status_code in [200, 400]
@@ -221,19 +250,17 @@ class TestRobustness:
         """Testa valores limítrofes"""
         # Texto no limite exato
         limit_text = "a" * 5000  # Exatamente o limite
-        response = client.post("/classify", data={
-            "text": limit_text,
-            "tone": "neutro"
-        })
+        response = client.post(
+            "/classify", data={"text": limit_text, "tone": "neutro"}
+        )
         # Pode dar 200 ou 400, mas não deve quebrar
         assert response.status_code in [200, 400]
 
         # Texto 1 char acima do limite
         over_limit_text = "a" * 5001
-        response = client.post("/classify", data={
-            "text": over_limit_text,
-            "tone": "neutro"
-        })
+        response = client.post(
+            "/classify", data={"text": over_limit_text, "tone": "neutro"}
+        )
         assert response.status_code == 400
 
 
@@ -254,21 +281,27 @@ class TestResourceUsage:
         for i in range(10):
             text = f"Teste de memória número {i} " * 50
 
-            with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                    patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+            with patch(
+                "app.services.ai.ai_provider.classify"
+            ) as mock_classify, patch(
+                "app.services.ai.ai_provider.generate_reply"
+            ) as mock_reply:
 
                 mock_classify.return_value = {
                     "category": "Produtivo",
                     "confidence": 0.8,
                     "rationale": f"Teste {i}",
-                    "meta": {"model": "test", "cost": 0.001, "fallback": False}
+                    "meta": {
+                        "model": "test",
+                        "cost": 0.001,
+                        "fallback": False,
+                    },
                 }
                 mock_reply.return_value = f"Resposta {i}"
 
-                response = client.post("/classify", data={
-                    "text": text,
-                    "tone": "neutro"
-                })
+                response = client.post(
+                    "/classify", data={"text": text, "tone": "neutro"}
+                )
 
         # Forçar garbage collection
         gc.collect()
@@ -288,21 +321,28 @@ class TestResourceUsage:
 
         # Fazer várias requisições
         for i in range(5):
-            with patch('app.services.ai.ai_provider.classify') as mock_classify, \
-                    patch('app.services.ai.ai_provider.generate_reply') as mock_reply:
+            with patch(
+                "app.services.ai.ai_provider.classify"
+            ) as mock_classify, patch(
+                "app.services.ai.ai_provider.generate_reply"
+            ) as mock_reply:
 
                 mock_classify.return_value = {
                     "category": "Produtivo",
                     "confidence": 0.8,
                     "rationale": "Teste CPU",
-                    "meta": {"model": "test", "cost": 0.001, "fallback": False}
+                    "meta": {
+                        "model": "test",
+                        "cost": 0.001,
+                        "fallback": False,
+                    },
                 }
                 mock_reply.return_value = "Resposta"
 
-                response = client.post("/classify", data={
-                    "text": f"Teste CPU {i}" * 100,
-                    "tone": "neutro"
-                })
+                response = client.post(
+                    "/classify",
+                    data={"text": f"Teste CPU {i}" * 100, "tone": "neutro"},
+                )
 
         cpu_after = psutil.cpu_percent(interval=1)
 

@@ -1,5 +1,5 @@
 import re
-from typing import List, Optional
+from typing import List
 
 from app.core.logger import get_logger
 
@@ -12,17 +12,21 @@ def clean_text(text: str) -> str:
         return ""
 
     # Remove email headers (line by line)
-    lines = text.split('\n')
+    lines = text.split("\n")
     cleaned_lines = []
 
     for line in lines:
         line = line.strip()
         # Skip header lines
-        if (line.startswith('De:') or line.startswith('Para:') or
-                line.startswith('Assunto:') or line.startswith('Data:')):
+        if (
+            line.startswith("De:")
+            or line.startswith("Para:")
+            or line.startswith("Assunto:")
+            or line.startswith("Data:")
+        ):
             continue
         # Skip signature separator but stop processing after it
-        if re.match(r'^--+\s*$', line):
+        if re.match(r"^--+\s*$", line):
             break
         # Skip empty lines at the beginning
         if not line and not cleaned_lines:
@@ -30,13 +34,13 @@ def clean_text(text: str) -> str:
         cleaned_lines.append(line)
 
     # Join lines and clean up
-    result = ' '.join(cleaned_lines)
+    result = " ".join(cleaned_lines)
 
     # Remove other footers
-    result = re.sub(r'Enviado do meu.*$', '', result, flags=re.MULTILINE)
+    result = re.sub(r"Enviado do meu.*$", "", result, flags=re.MULTILINE)
 
     # Normalize spaces
-    result = re.sub(r'\s+', ' ', result)
+    result = re.sub(r"\s+", " ", result)
 
     return result.strip()
 
@@ -48,12 +52,14 @@ def preprocess_text(text: str) -> str:
         cleaned = clean_text(text)
 
         # Additional normalization
-        cleaned = re.sub(r'[^\w\s\.,\!\?\-]', '', cleaned)
-        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+        cleaned = re.sub(r"[^\w\s\.,\!\?\-]", "", cleaned)
+        cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
-        logger.info("Text preprocessed successfully",
-                    original_length=len(text),
-                    cleaned_length=len(cleaned))
+        logger.info(
+            "Text preprocessed successfully",
+            original_length=len(text),
+            cleaned_length=len(cleaned),
+        )
 
         return cleaned
     except Exception as e:
@@ -68,11 +74,30 @@ def extract_keywords(text: str) -> List[str]:
 
     # Define productive keywords with weights
     productive_keywords = [
-        'suporte', 'status', 'chamado', 'erro', 'problema', 'bug',
-        'protocolo', 'ticket', 'urgente', 'bloqueio', 'acesso',
-        'fatura', 'cobrança', 'pagamento', 'prazo', 'vencimento',
-        'sistema', 'funcionalidade', 'recurso', 'configuração',
-        'dúvida', 'informação', 'esclarecimento', 'solicitação'
+        "suporte",
+        "status",
+        "chamado",
+        "erro",
+        "problema",
+        "bug",
+        "protocolo",
+        "ticket",
+        "urgente",
+        "bloqueio",
+        "acesso",
+        "fatura",
+        "cobrança",
+        "pagamento",
+        "prazo",
+        "vencimento",
+        "sistema",
+        "funcionalidade",
+        "recurso",
+        "configuração",
+        "dúvida",
+        "informação",
+        "esclarecimento",
+        "solicitação",
     ]
 
     text_lower = text.lower()
@@ -91,7 +116,7 @@ def detect_language(text: str) -> str:
         return "pt"
 
     # Simple Portuguese indicators
-    pt_indicators = ['que', 'para', 'com', 'não', 'por', 'uma', 'seu', 'sua']
+    pt_indicators = ["que", "para", "com", "não", "por", "uma", "seu", "sua"]
     text_lower = text.lower()
 
     count = sum(1 for indicator in pt_indicators if indicator in text_lower)

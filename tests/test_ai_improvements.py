@@ -5,8 +5,11 @@ Testes das melhorias de IA - Demonstra ajuste e otimização da IA
 import pytest
 
 from app.services.ai import ai_provider
-from app.services.prompt_templates import (PromptOptimizer, PromptTemplates,
-                                           prompt_optimizer)
+from app.services.prompt_templates import (
+    PromptOptimizer,
+    PromptTemplates,
+    prompt_optimizer,
+)
 
 
 class TestPromptOptimization:
@@ -18,13 +21,17 @@ class TestPromptOptimization:
 
         # Prompt básico vs melhorado
         basic_prompt = f'Classifique: "{text}"'
-        enhanced_prompt = PromptTemplates.get_classification_prompt_with_examples(
-            text)
+        enhanced_prompt = (
+            PromptTemplates.get_classification_prompt_with_examples(text)
+        )
 
         # Prompt melhorado deve ser mais detalhado
         assert len(enhanced_prompt) > len(basic_prompt) * 5
         assert "EXEMPLOS DE TREINAMENTO" in enhanced_prompt
-        assert "few-shot" in enhanced_prompt or "exemplos" in enhanced_prompt.lower()
+        assert (
+            "few-shot" in enhanced_prompt
+            or "exemplos" in enhanced_prompt.lower()
+        )
 
         # Deve conter exemplos específicos
         assert "Problema técnico urgente" in enhanced_prompt
@@ -42,9 +49,15 @@ class TestPromptOptimization:
             # Deve conter instruções específicas por tom
             # Para "neutro", o sistema usa "linguagem clara e direta"
             if tone == "neutro":
-                assert "clara e direta" in prompt or "linguagem" in prompt.lower()
+                assert (
+                    "clara e direta" in prompt or "linguagem" in prompt.lower()
+                )
             else:
-                assert tone in prompt.lower() or tone == "amigavel" and "calorosa" in prompt
+                assert (
+                    tone in prompt.lower()
+                    or tone == "amigavel"
+                    and "calorosa" in prompt
+                )
 
             assert "INSTRUÇÕES ESPECÍFICAS" in prompt
             assert "EXEMPLOS DE BOM ATENDIMENTO" in prompt
@@ -58,9 +71,11 @@ class TestPromptOptimization:
         assert not optimizer.should_use_enhanced_prompt(simple_text)
 
         # Texto complexo
-        complex_text = "Preciso urgentemente de ajuda com o protocolo #12345, " \
-            "pois o sistema crítico está fora do ar há 2 horas e " \
+        complex_text = (
+            "Preciso urgentemente de ajuda com o protocolo #12345, "
+            "pois o sistema crítico está fora do ar há 2 horas e "
             "isso está impactando toda a operação"
+        )
         assert optimizer.should_use_enhanced_prompt(complex_text)
 
     def test_optimized_classification_prompt_selection(self):
@@ -70,13 +85,15 @@ class TestPromptOptimization:
         # Texto simples - prompt básico
         simple_text = "Obrigado pela ajuda"
         simple_prompt = optimizer.get_optimized_classification_prompt(
-            simple_text)
+            simple_text
+        )
         assert len(simple_prompt) < 500  # Prompt mais simples
 
         # Texto complexo - prompt melhorado
         complex_text = "Sistema crítico fora do ar, protocolo urgente #12345"
         complex_prompt = optimizer.get_optimized_classification_prompt(
-            complex_text)
+            complex_text
+        )
         assert len(complex_prompt) > 1000  # Prompt com exemplos
         assert "EXEMPLOS DE TREINAMENTO" in complex_prompt
 
@@ -85,9 +102,11 @@ class TestPromptOptimization:
         optimizer = PromptOptimizer()
 
         # Resposta boa
-        good_response = ("Prezado(a), identificamos o problema relatado. "
-                         "Nossa equipe iniciará análise em até 24h úteis. "
-                         "Favor informar número do protocolo. Atenciosamente.")
+        good_response = (
+            "Prezado(a), identificamos o problema relatado. "
+            "Nossa equipe iniciará análise em até 24h úteis. "
+            "Favor informar número do protocolo. Atenciosamente."
+        )
 
         quality = optimizer.analyze_response_quality(
             "Problema no sistema", good_response, "Produtivo"
@@ -132,8 +151,9 @@ class TestAITrainingDemonstration:
     def test_prompt_engineering_sophistication(self):
         """Testa sofisticação da engenharia de prompts"""
         # Prompt de classificação
-        classification_prompt = PromptTemplates.get_classification_prompt_with_examples(
-            "Teste")
+        classification_prompt = (
+            PromptTemplates.get_classification_prompt_with_examples("Teste")
+        )
 
         # Deve conter elementos avançados
         advanced_elements = [
@@ -141,7 +161,7 @@ class TestAITrainingDemonstration:
             "EXEMPLOS DE TREINAMENTO:",
             "AGORA CLASSIFIQUE:",
             "JSON válido",
-            "rationale"
+            "rationale",
         ]
 
         for element in advanced_elements:
@@ -157,7 +177,7 @@ class TestAITrainingDemonstration:
             "INSTRUÇÕES ESPECÍFICAS:",
             "REGRAS PARA EMAILS",
             "EXEMPLOS DE BOM ATENDIMENTO:",
-            "linguagem formal"
+            "linguagem formal",
         ]
 
         for element in reply_elements:
@@ -167,12 +187,17 @@ class TestAITrainingDemonstration:
     async def test_confidence_calculation_improvement(self):
         """Testa cálculo de confiança como métrica de qualidade"""
         # Simula classificação com alta confiança
-        high_confidence_text = "Problema urgente no sistema, preciso de suporte técnico"
-        result = {"category": "Produtivo",
-                  "rationale": "Problema técnico claro que requer suporte imediato"}
+        high_confidence_text = (
+            "Problema urgente no sistema, preciso de suporte técnico"
+        )
+        result = {
+            "category": "Produtivo",
+            "rationale": "Problema técnico claro que requer suporte imediato",
+        }
 
         confidence = ai_provider._calculate_confidence(
-            high_confidence_text, result)
+            high_confidence_text, result
+        )
         assert confidence > 0.7  # Alta confiança
 
         # Simula classificação com baixa confiança
@@ -180,7 +205,8 @@ class TestAITrainingDemonstration:
         result_low = {"category": "Produtivo", "rationale": "Difícil"}
 
         confidence_low = ai_provider._calculate_confidence(
-            low_confidence_text, result_low)
+            low_confidence_text, result_low
+        )
         assert confidence_low < confidence  # Confiança menor
 
 
@@ -194,11 +220,14 @@ class TestPromptVersioning:
 
         # Prompt v2 (com exemplos)
         v2_prompt = PromptTemplates.get_classification_prompt_with_examples(
-            "teste")
+            "teste"
+        )
 
         # v2 deve ser significativamente mais complexo
         assert len(v2_prompt) > len(v1_prompt) * 10
-        assert "exemplos" in v2_prompt.lower() or "examples" in v2_prompt.lower()
+        assert (
+            "exemplos" in v2_prompt.lower() or "examples" in v2_prompt.lower()
+        )
 
     def test_context_aware_prompting(self):
         """Testa prompts conscientes de contexto"""
@@ -211,7 +240,7 @@ class TestPromptVersioning:
             "Urgência",
             "Tipo de solicitação",
             "Estado emocional",
-            "Complexidade"
+            "Complexidade",
         ]
 
         for factor in context_factors:
@@ -231,8 +260,10 @@ class TestContinuousImprovement:
             "Preciso urgentemente resolver protocolo #12345 do sistema crítico",  # Complexo
         ]
 
-        prompts = [optimizer.get_optimized_classification_prompt(
-            case) for case in cases]
+        prompts = [
+            optimizer.get_optimized_classification_prompt(case)
+            for case in cases
+        ]
 
         # Prompts devem ser diferentes
         assert prompts[0] != prompts[1]

@@ -46,7 +46,9 @@ Responda APENAS em JSON válido seguindo o formato dos exemplos:
 {{"category":"Produtivo|Improdutivo","rationale":"<justificativa específica e objetiva>"}}"""
 
     @staticmethod
-    def get_reply_generation_prompt_enhanced(text: str, category: str, tone: str) -> str:
+    def get_reply_generation_prompt_enhanced(
+        text: str, category: str, tone: str
+    ) -> str:
         """
         Prompt melhorado para geração de respostas com contexto empresarial
         """
@@ -54,18 +56,18 @@ Responda APENAS em JSON válido seguindo o formato dos exemplos:
             "formal": {
                 "greeting": "Prezado(a)",
                 "closing": "Atenciosamente,\nEquipe de Atendimento",
-                "style": "linguagem formal e protocolar"
+                "style": "linguagem formal e protocolar",
             },
             "neutro": {
                 "greeting": "Olá",
                 "closing": "Cordialmente,\nSuporte",
-                "style": "linguagem clara e direta"
+                "style": "linguagem clara e direta",
             },
             "amigavel": {
                 "greeting": "Oi! 😊",
                 "closing": "Um abraço,\nTime de Suporte",
-                "style": "linguagem calorosa e próxima, com emojis apropriados"
-            }
+                "style": "linguagem calorosa e próxima, com emojis apropriados",
+            },
         }
 
         style_config = tone_styles.get(tone, tone_styles["neutro"])
@@ -201,12 +203,16 @@ class PromptOptimizer:
         """
         complexity_indicators = [
             len(text.split()) > 50,  # Texto longo
-            any(word in text.lower()
+            any(
+                word in text.lower()
                 # Termos técnicos
-                for word in ['protocolo', 'chamado', 'ticket']),
-            text.count('?') > 1,  # Múltiplas perguntas
-            any(word in text.lower()
-                for word in ['urgente', 'crítico', 'imediato'])  # Urgência
+                for word in ["protocolo", "chamado", "ticket"]
+            ),
+            text.count("?") > 1,  # Múltiplas perguntas
+            any(
+                word in text.lower()
+                for word in ["urgente", "crítico", "imediato"]
+            ),  # Urgência
         ]
 
         return sum(complexity_indicators) >= 2
@@ -225,22 +231,35 @@ class PromptOptimizer:
 
 Responda em JSON: {{"category":"Produtivo|Improdutivo","rationale":"motivo"}}"""
 
-    def get_optimized_reply_prompt(self, text: str, category: str, tone: str) -> str:
+    def get_optimized_reply_prompt(
+        self, text: str, category: str, tone: str
+    ) -> str:
         """
         Retorna prompt otimizado para geração de resposta
         """
-        return self.templates.get_reply_generation_prompt_enhanced(text, category, tone)
+        return self.templates.get_reply_generation_prompt_enhanced(
+            text, category, tone
+        )
 
-    def analyze_response_quality(self, original_text: str, response: str, category: str) -> dict:
+    def analyze_response_quality(
+        self, original_text: str, response: str, category: str
+    ) -> dict:
         """
         Analisa qualidade da resposta para feedback e melhoria contínua
         """
         quality_metrics = {
             "length_appropriate": 50 <= len(response) <= 300,
-            "addresses_request": any(word in response.lower() for word in original_text.lower().split()[:10]),
-            "has_next_steps": "será" in response or "prazo" in response or "retorno" in response,
-            "professional_tone": not any(word in response.lower() for word in ["tchau", "beijo", "xoxo"]),
-            "category_appropriate": True  # Simplificado para demo
+            "addresses_request": any(
+                word in response.lower()
+                for word in original_text.lower().split()[:10]
+            ),
+            "has_next_steps": "será" in response
+            or "prazo" in response
+            or "retorno" in response,
+            "professional_tone": not any(
+                word in response.lower() for word in ["tchau", "beijo", "xoxo"]
+            ),
+            "category_appropriate": True,  # Simplificado para demo
         }
 
         quality_score = sum(quality_metrics.values()) / len(quality_metrics)
@@ -248,7 +267,7 @@ Responda em JSON: {{"category":"Produtivo|Improdutivo","rationale":"motivo"}}"""
         return {
             "score": quality_score,
             "metrics": quality_metrics,
-            "needs_improvement": quality_score < 0.8
+            "needs_improvement": quality_score < 0.8,
         }
 
 

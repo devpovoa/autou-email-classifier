@@ -1,7 +1,6 @@
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict
 
 from app.core.config import settings
 
@@ -11,7 +10,7 @@ def setup_logging():
     logging.basicConfig(
         level=getattr(logging, settings.log_level.upper()),
         format="%(message)s",
-        handlers=[logging.StreamHandler()]
+        handlers=[logging.StreamHandler()],
     )
 
 
@@ -33,10 +32,11 @@ class StructuredLogger:
             "timestamp": datetime.utcnow().isoformat(),
             "level": level,
             "message": message,
-            **kwargs
+            **kwargs,
         }
-        self.logger.log(getattr(logging, level),
-                        json.dumps(log_entry, default=str))
+        self.logger.log(
+            getattr(logging, level), json.dumps(log_entry, default=str)
+        )
 
 
 def get_logger(name: str) -> StructuredLogger:

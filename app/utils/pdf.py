@@ -31,9 +31,11 @@ def extract_text_from_pdf(file_content: bytes) -> Optional[str]:
             logger.warning("PDF contains no extractable text")
             return None
 
-        logger.info("PDF text extracted successfully",
-                    pages=len(reader.pages),
-                    text_length=len(text))
+        logger.info(
+            "PDF text extracted successfully",
+            pages=len(reader.pages),
+            text_length=len(text),
+        )
 
         return text
 

@@ -1,11 +1,8 @@
 import os
 import sys
 
-from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 
-from app.core.config import settings
 from app.core.logger import setup_logging
 from app.web.routes import router
 
@@ -16,7 +13,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="AutoU - Classificador de E-mails",
         description="Sistema inteligente de classificação e resposta automática de e-mails",
-        version="1.0.0"
+        version="1.0.0",
     )
 
     # Setup logging

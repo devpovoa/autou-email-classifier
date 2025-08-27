@@ -8,9 +8,14 @@ import pytest
 from fastapi.testclient import TestClient
 from jose import jwt
 
-from app.core.auth import (authenticate_user, create_access_token,
-                           generate_api_key, hash_api_key, rate_limiter,
-                           verify_token)
+from app.core.auth import (
+    authenticate_user,
+    create_access_token,
+    generate_api_key,
+    hash_api_key,
+    rate_limiter,
+    verify_token,
+)
 from app.core.config import settings
 from main import app
 
@@ -27,9 +32,7 @@ class TestJWTAuthentication:
 
         # Verify token can be decoded
         payload = jwt.decode(
-            token,
-            settings.jwt_secret_key,
-            algorithms=[settings.jwt_algorithm]
+            token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
         )
 
         assert payload["sub"] == "testuser"
@@ -46,9 +49,7 @@ class TestJWTAuthentication:
 
         # Decode and verify
         payload = jwt.decode(
-            token,
-            settings.jwt_secret_key,
-            algorithms=[settings.jwt_algorithm]
+            token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
         )
 
         # Check expiration (allow small time difference for processing)
@@ -130,8 +131,7 @@ class TestAuthenticationEndpoints:
     def test_login_endpoint_valid_credentials(self):
         """Test login endpoint with valid credentials."""
         response = client.post(
-            "/auth/token",
-            data={"username": "admin", "password": "admin123"}
+            "/auth/token", data={"username": "admin", "password": "admin123"}
         )
 
         assert response.status_code == 200
@@ -146,7 +146,7 @@ class TestAuthenticationEndpoints:
         """Test login endpoint with invalid credentials."""
         response = client.post(
             "/auth/token",
-            data={"username": "admin", "password": "wrongpassword"}
+            data={"username": "admin", "password": "wrongpassword"},
         )
 
         assert response.status_code == 401
@@ -156,15 +156,13 @@ class TestAuthenticationEndpoints:
         """Test /auth/me endpoint with valid token."""
         # First login to get token
         login_response = client.post(
-            "/auth/token",
-            data={"username": "admin", "password": "admin123"}
+            "/auth/token", data={"username": "admin", "password": "admin123"}
         )
         token = login_response.json()["access_token"]
 
         # Use token to access protected endpoint
         response = client.get(
-            "/auth/me",
-            headers={"Authorization": f"Bearer {token}"}
+            "/auth/me", headers={"Authorization": f"Bearer {token}"}
         )
 
         assert response.status_code == 200
@@ -189,8 +187,7 @@ class TestProtectedEndpoints:
     def get_admin_token(self):
         """Helper to get admin token."""
         response = client.post(
-            "/auth/token",
-            data={"username": "admin", "password": "admin123"}
+            "/auth/token", data={"username": "admin", "password": "admin123"}
         )
         return response.json()["access_token"]
 
@@ -201,7 +198,7 @@ class TestProtectedEndpoints:
         response = client.post(
             "/api/classify/text",
             json={"text": "Preciso de ajuda urgente com o sistema!"},
-            headers={"Authorization": f"Bearer {token}"}
+            headers={"Authorization": f"Bearer {token}"},
         )
 
         assert response.status_code == 200
@@ -214,8 +211,7 @@ class TestProtectedEndpoints:
     def test_classify_text_without_token(self):
         """Test text classification without token."""
         response = client.post(
-            "/api/classify/text",
-            json={"text": "Test text"}
+            "/api/classify/text", json={"text": "Test text"}
         )
 
         # FastAPI Security returns 403 when no token provided
@@ -230,7 +226,7 @@ class TestProtectedEndpoints:
         response = client.post(
             "/api/classify/text",
             json={"text": "Test text"},
-            headers={"Authorization": f"Bearer {token}"}
+            headers={"Authorization": f"Bearer {token}"},
         )
 
         # Admin has all scopes, so this should succeed
@@ -264,7 +260,7 @@ class TestAPIKeyAuthentication:
         response = client.post(
             "/api/v1/classify",
             json={"text": "Test email content"},
-            headers={settings.api_key_header: settings.default_api_key}
+            headers={settings.api_key_header: settings.default_api_key},
         )
 
         assert response.status_code == 200
@@ -278,7 +274,7 @@ class TestAPIKeyAuthentication:
         response = client.post(
             "/api/v1/classify",
             json={"text": "Test email content"},
-            headers={settings.api_key_header: "invalid_key"}
+            headers={settings.api_key_header: "invalid_key"},
         )
 
         assert response.status_code == 401

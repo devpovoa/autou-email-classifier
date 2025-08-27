@@ -1,18 +1,33 @@
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Optional
 
-from fastapi import (APIRouter, Depends, File, Form, HTTPException, Request,
-                     UploadFile, status)
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from app.core.auth import (Token, User, api_key_auth, authenticate_user,
-                           create_access_token, create_refresh_token,
-                           get_current_active_user, rate_limit_check,
-                           require_scopes)
+from app.core.auth import (
+    Token,
+    User,
+    api_key_auth,
+    authenticate_user,
+    create_access_token,
+    create_refresh_token,
+    get_current_active_user,
+    rate_limit_check,
+    require_scopes,
+)
 from app.core.config import settings
 from app.core.logger import get_logger
 from app.services.ai import ai_provider
@@ -71,7 +86,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
     access_token = create_access_token(
         data={"sub": user.username, "scopes": user.scopes},
-        expires_delta=access_token_expires
+        expires_delta=access_token_expires,
     )
 
     # Create refresh token
@@ -83,7 +98,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer",
-        "expires_in": settings.jwt_access_token_expire_minutes * 60
+        "expires_in": settings.jwt_access_token_expire_minutes * 60,
     }
 
 
@@ -98,7 +113,7 @@ async def get_me(current_user: User = Depends(get_current_active_user)):
 async def classify_text_api(
     request: ClassifyRequest,
     current_user: User = Depends(require_scopes("classify:read")),
-    _: bool = Depends(rate_limit_check)
+    _: bool = Depends(rate_limit_check),
 ):
     """
     Classify email text via API (JWT protected).
@@ -109,7 +124,7 @@ async def classify_text_api(
         if len(request.text) > settings.max_input_chars:
             raise HTTPException(
                 status_code=400,
-                detail=f"Text exceeds limit of {settings.max_input_chars}"
+                detail=f"Text exceeds limit of {settings.max_input_chars}",
             )
 
         # Preprocess text
@@ -135,7 +150,7 @@ async def classify_text_api(
 async def classify_file_api(
     file: UploadFile = File(...),
     current_user: User = Depends(require_scopes("classify:read")),
-    _: bool = Depends(rate_limit_check)
+    _: bool = Depends(rate_limit_check),
 ):
     """
     Classify email file via API (JWT protected).
@@ -174,8 +189,7 @@ async def classify_file_api(
 # Alternative API key authentication (for legacy systems)
 @router.post("/api/v1/classify")
 async def classify_with_api_key(
-    request: ClassifyRequest,
-    api_key: str = Depends(api_key_auth)
+    request: ClassifyRequest, api_key: str = Depends(api_key_auth)
 ):
     """
     Classify email text using API key authentication.
@@ -186,7 +200,7 @@ async def classify_with_api_key(
         if len(request.text) > settings.max_input_chars:
             raise HTTPException(
                 status_code=400,
-                detail=f"Text exceeds limit of {settings.max_input_chars}"
+                detail=f"Text exceeds limit of {settings.max_input_chars}",
             )
 
         # Preprocess text
@@ -211,7 +225,7 @@ async def classify_email(
     request: Request,
     text: Optional[str] = Form(None),
     tone: str = Form("neutro"),
-    file: Optional[UploadFile] = File(None)
+    file: Optional[UploadFile] = File(None),
 ):
     """Classify email and generate response"""
     start_time = time.time()
@@ -223,12 +237,13 @@ async def classify_email(
         # Validate input
         if not email_text or len(email_text.strip()) < 5:
             raise HTTPException(
-                status_code=400, detail="Texto muito curto ou vazio")
+                status_code=400, detail="Texto muito curto ou vazio"
+            )
 
         if len(email_text) > settings.max_input_chars:
             raise HTTPException(
                 status_code=400,
-                detail=f"Texto excede o limite de {settings.max_input_chars} caracteres"
+                detail=f"Texto excede o limite de {settings.max_input_chars} caracteres",
             )
 
         # Preprocess text
@@ -239,23 +254,23 @@ async def classify_email(
 
         # Generate reply
         reply = await ai_provider.generate_reply(
-            processed_text,
-            classification["category"],
-            tone
+            processed_text, classification["category"], tone
         )
 
         # Calculate response time
         latency_ms = max(1, round((time.time() - start_time) * 1000))
 
         # Log the operation
-        logger.info("Classification completed successfully",
-                    text_length=len(email_text),
-                    category=classification["category"],
-                    confidence=classification["confidence"],
-                    tone=tone,
-                    latency_ms=latency_ms,
-                    model=classification["meta"]["model"],
-                    fallback=classification["meta"].get("fallback", False))
+        logger.info(
+            "Classification completed successfully",
+            text_length=len(email_text),
+            category=classification["category"],
+            confidence=classification["confidence"],
+            tone=tone,
+            latency_ms=latency_ms,
+            model=classification["meta"]["model"],
+            fallback=classification["meta"].get("fallback", False),
+        )
 
         # Return response
         response = {
@@ -264,7 +279,7 @@ async def classify_email(
             "reply": reply,
             "rationale": classification["rationale"],
             "meta": classification["meta"],
-            "latency_ms": latency_ms
+            "latency_ms": latency_ms,
         }
 
         return JSONResponse(content=response)
@@ -273,9 +288,9 @@ async def classify_email(
         raise
     except Exception as e:
         latency_ms = max(1, round((time.time() - start_time) * 1000))
-        logger.error("Classification failed",
-                     error=str(e),
-                     latency_ms=latency_ms)
+        logger.error(
+            "Classification failed", error=str(e), latency_ms=latency_ms
+        )
         raise HTTPException(status_code=500, detail="Erro interno do servidor")
 
 
@@ -287,35 +302,41 @@ async def refine_reply(request: RefineRequest):
     try:
         if not request.text or len(request.text.strip()) < 10:
             raise HTTPException(
-                status_code=400, detail="Texto muito curto para refinar")
+                status_code=400, detail="Texto muito curto para refinar"
+            )
 
         # Refine the reply
-        refined_reply = await ai_provider.refine_reply(request.text, request.tone)
+        refined_reply = await ai_provider.refine_reply(
+            request.text, request.tone
+        )
 
         latency_ms = round((time.time() - start_time) * 1000)
 
-        logger.info("Reply refined successfully",
-                    original_length=len(request.text),
-                    refined_length=len(refined_reply),
-                    tone=request.tone,
-                    latency_ms=latency_ms)
+        logger.info(
+            "Reply refined successfully",
+            original_length=len(request.text),
+            refined_length=len(refined_reply),
+            tone=request.tone,
+            latency_ms=latency_ms,
+        )
 
-        return JSONResponse(content={
-            "reply": refined_reply,
-            "latency_ms": latency_ms
-        })
+        return JSONResponse(
+            content={"reply": refined_reply, "latency_ms": latency_ms}
+        )
 
     except HTTPException:
         raise
     except Exception as e:
         latency_ms = round((time.time() - start_time) * 1000)
-        logger.error("Reply refinement failed",
-                     error=str(e),
-                     latency_ms=latency_ms)
+        logger.error(
+            "Reply refinement failed", error=str(e), latency_ms=latency_ms
+        )
         raise HTTPException(status_code=500, detail="Erro ao refinar resposta")
 
 
-async def _extract_text(form_text: Optional[str], file: Optional[UploadFile]) -> str:
+async def _extract_text(
+    form_text: Optional[str], file: Optional[UploadFile]
+) -> str:
     """Extract text from form input or uploaded file"""
 
     if form_text and form_text.strip():
@@ -327,37 +348,46 @@ async def _extract_text(form_text: Optional[str], file: Optional[UploadFile]) ->
         if len(file_content) > settings.max_file_size:
             raise HTTPException(
                 status_code=400,
-                detail=f"Arquivo muito grande (máximo: {settings.max_file_size // 1024 // 1024}MB)"
+                detail=f"Arquivo muito grande (máximo: {settings.max_file_size // 1024 // 1024}MB)",
             )
 
         # Process based on file extension
         filename_lower = file.filename.lower()
 
-        if filename_lower.endswith('.pdf'):
+        if filename_lower.endswith(".pdf"):
             if not validate_pdf(file_content):
                 raise HTTPException(
-                    status_code=400, detail="Arquivo PDF inválido")
+                    status_code=400, detail="Arquivo PDF inválido"
+                )
 
             text = extract_text_from_pdf(file_content)
             if not text:
                 raise HTTPException(
-                    status_code=400, detail="Não foi possível extrair texto do PDF")
+                    status_code=400,
+                    detail="Não foi possível extrair texto do PDF",
+                )
             return text
 
-        elif filename_lower.endswith(('.txt', '.text')):
+        elif filename_lower.endswith((".txt", ".text")):
             if not validate_txt(file_content):
                 raise HTTPException(
-                    status_code=400, detail="Arquivo TXT inválido")
+                    status_code=400, detail="Arquivo TXT inválido"
+                )
 
             text = extract_text_from_txt(file_content)
             if not text:
                 raise HTTPException(
-                    status_code=400, detail="Não foi possível extrair texto do arquivo")
+                    status_code=400,
+                    detail="Não foi possível extrair texto do arquivo",
+                )
             return text
 
         else:
             raise HTTPException(
-                status_code=400, detail="Tipo de arquivo não suportado (apenas .txt e .pdf)")
+                status_code=400,
+                detail="Tipo de arquivo não suportado (apenas .txt e .pdf)",
+            )
 
     raise HTTPException(
-        status_code=400, detail="Nenhum texto ou arquivo fornecido")
+        status_code=400, detail="Nenhum texto ou arquivo fornecido"
+    )

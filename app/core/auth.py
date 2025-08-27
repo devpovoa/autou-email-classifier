@@ -12,8 +12,11 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
 from fastapi import Depends, HTTPException, Security, status
-from fastapi.security import (APIKeyHeader, HTTPAuthorizationCredentials,
-                              HTTPBearer)
+from fastapi.security import (
+    APIKeyHeader,
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+)
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
@@ -61,15 +64,15 @@ fake_users_db = {
         "email": "admin@autou.com",
         "hashed_password": pwd_context.hash("admin123"),
         "is_active": True,
-        "scopes": ["classify:read", "classify:write", "admin"]
+        "scopes": ["classify:read", "classify:write", "admin"],
     },
     "api_user": {
         "username": "api_user",
         "email": "api@autou.com",
         "hashed_password": pwd_context.hash("apiuser123"),
         "is_active": True,
-        "scopes": ["classify:read", "classify:write"]
-    }
+        "scopes": ["classify:read", "classify:write"],
+    },
 }
 
 
@@ -97,8 +100,7 @@ def authenticate_user(username: str, password: str) -> Optional[UserInDB]:
 
 
 def create_access_token(
-    data: dict,
-    expires_delta: Optional[timedelta] = None
+    data: dict, expires_delta: Optional[timedelta] = None
 ) -> str:
     """Create JWT access token."""
     to_encode = data.copy()
@@ -113,9 +115,7 @@ def create_access_token(
     to_encode.update({"exp": expire})
 
     encoded_jwt = jwt.encode(
-        to_encode,
-        settings.jwt_secret_key,
-        algorithm=settings.jwt_algorithm
+        to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
     )
 
     return encoded_jwt
@@ -130,9 +130,7 @@ def create_refresh_token(data: dict) -> str:
     to_encode.update({"exp": expire, "type": "refresh"})
 
     encoded_jwt = jwt.encode(
-        to_encode,
-        settings.jwt_secret_key,
-        algorithm=settings.jwt_algorithm
+        to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
     )
 
     return encoded_jwt
@@ -142,9 +140,7 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
     """Verify and decode JWT token."""
     try:
         payload = jwt.decode(
-            token,
-            settings.jwt_secret_key,
-            algorithms=[settings.jwt_algorithm]
+            token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
         )
 
         username: str = payload.get("sub")
@@ -155,7 +151,7 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
         return {
             "username": username,
             "scopes": token_scopes,
-            "exp": payload.get("exp")
+            "exp": payload.get("exp"),
         }
 
     except JWTError as e:
@@ -164,7 +160,7 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Security(security)
+    credentials: HTTPAuthorizationCredentials = Security(security),
 ) -> User:
     """Get current authenticated user from JWT token."""
     credentials_exception = HTTPException(
@@ -195,13 +191,12 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> User:
     """Get current active user."""
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
     return current_user
 
@@ -216,7 +211,7 @@ def verify_api_key(api_key: str) -> bool:
 
 
 async def api_key_auth(
-    api_key: Optional[str] = Security(api_key_header)
+    api_key: Optional[str] = Security(api_key_header),
 ) -> Optional[str]:
     """API Key authentication dependency."""
     if not settings.enable_auth:
@@ -224,14 +219,12 @@ async def api_key_auth(
 
     if not api_key:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API key required"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="API key required"
         )
 
     if not verify_api_key(api_key):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API key"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key"
         )
 
     return api_key
@@ -239,11 +232,12 @@ async def api_key_auth(
 
 def require_scopes(*required_scopes: str):
     """Decorator to require specific scopes for endpoint access."""
+
     def scope_checker(current_user: User = Depends(get_current_active_user)):
         if not any(scope in current_user.scopes for scope in required_scopes):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions"
+                detail="Insufficient permissions",
             )
         return current_user
 
@@ -275,7 +269,8 @@ class RateLimiter:
 
         # Clean old requests
         self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier]
+            req_time
+            for req_time in self.requests[identifier]
             if req_time > window_start
         ]
 
@@ -293,7 +288,7 @@ rate_limiter = RateLimiter()
 
 
 async def rate_limit_check(
-    current_user: Optional[User] = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user),
 ):
     """Rate limiting dependency."""
     identifier = current_user.username if current_user else "anonymous"
@@ -301,7 +296,7 @@ async def rate_limit_check(
     if not rate_limiter.is_allowed(identifier):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Rate limit exceeded"
+            detail="Rate limit exceeded",
         )
 
     return True

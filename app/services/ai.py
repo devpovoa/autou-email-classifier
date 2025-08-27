@@ -1,6 +1,5 @@
-import asyncio
 import json
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict
 
 import httpx
 
@@ -24,13 +23,15 @@ class AIProvider:
             if settings.provider == "OpenAI":
                 # Use optimized prompts
                 prompt = prompt_optimizer.get_optimized_classification_prompt(
-                    text)
+                    text
+                )
                 result = await self._classify_openai_with_prompt(prompt)
 
                 # Add quality analysis
-                if result.get('category'):
-                    result['confidence'] = self._calculate_confidence(
-                        text, result)
+                if result.get("category"):
+                    result["confidence"] = self._calculate_confidence(
+                        text, result
+                    )
 
                 return result
 
@@ -39,8 +40,11 @@ class AIProvider:
             else:
                 raise ValueError(f"Unsupported provider: {settings.provider}")
         except Exception as e:
-            logger.error("AI classification failed",
-                         error=str(e), provider=settings.provider)
+            logger.error(
+                "AI classification failed",
+                error=str(e),
+                provider=settings.provider,
+            )
             # Fallback to heuristics
             category, confidence, rationale = classify_heuristic(text)
             return {
@@ -50,8 +54,8 @@ class AIProvider:
                 "meta": {
                     "model": "heuristic_fallback",
                     "cost": 0.0,
-                    "fallback": True
-                }
+                    "fallback": True,
+                },
             }
 
     async def generate_reply(self, text: str, category: str, tone: str) -> str:
@@ -64,9 +68,7 @@ class AIProvider:
                 prompt = prompt_optimizer.get_optimized_reply_prompt(
                     text, category, tone
                 )
-                reply = await self._generate_reply_openai_with_prompt(
-                    prompt
-                )
+                reply = await self._generate_reply_openai_with_prompt(prompt)
 
                 # Analyze response quality
                 quality = prompt_optimizer.analyze_response_quality(
@@ -75,14 +77,18 @@ class AIProvider:
 
                 # Log quality metrics for improvement
                 logger.info(f"Reply quality score: {quality['score']}")
-                if quality['needs_improvement']:
-                    logger.warning("Reply quality below threshold, "
-                                   "consider prompt refinement")
+                if quality["needs_improvement"]:
+                    logger.warning(
+                        "Reply quality below threshold, "
+                        "consider prompt refinement"
+                    )
 
                 return reply
 
             elif settings.provider == "HF":
-                return await self._generate_reply_huggingface(text, category, tone)
+                return await self._generate_reply_huggingface(
+                    text, category, tone
+                )
             else:
                 return self._generate_reply_fallback(category, tone)
         except Exception as e:
@@ -124,14 +130,14 @@ Responda APENAS em JSON válido:
                 "https://api.openai.com/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {settings.openai_api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 json={
                     "model": settings.model_name,
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.1,
-                    "max_tokens": 150
-                }
+                    "max_tokens": 150,
+                },
             )
 
             if response.status_code != 200:
@@ -152,8 +158,8 @@ Responda APENAS em JSON válido:
                     "meta": {
                         "model": settings.model_name,
                         "cost": self._estimate_cost(result.get("usage", {})),
-                        "fallback": False
-                    }
+                        "fallback": False,
+                    },
                 }
             except json.JSONDecodeError:
                 logger.warning("Invalid JSON response from OpenAI")
@@ -164,16 +170,18 @@ Responda APENAS em JSON válido:
                     "meta": {
                         "model": settings.model_name,
                         "cost": 0.0,
-                        "fallback": False
-                    }
+                        "fallback": False,
+                    },
                 }
 
-    async def _generate_reply_openai(self, text: str, category: str, tone: str) -> str:
+    async def _generate_reply_openai(
+        self, text: str, category: str, tone: str
+    ) -> str:
         """Generate reply using OpenAI"""
         tone_map = {
             "formal": "formal",
             "neutro": "neutro",
-            "amigavel": "amigável"
+            "amigavel": "amigável",
         }
 
         prompt = f"""Contexto: Você é um assistente de atendimento educado e objetivo.
@@ -194,14 +202,14 @@ E-mail recebido:
                 "https://api.openai.com/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {settings.openai_api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 json={
                     "model": settings.model_name,
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.3,
-                    "max_tokens": 300
-                }
+                    "max_tokens": 300,
+                },
             )
 
             if response.status_code != 200:
@@ -222,14 +230,14 @@ Responda apenas com o corpo revisado."""
                 "https://api.openai.com/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {settings.openai_api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 json={
                     "model": settings.model_name,
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.3,
-                    "max_tokens": 300
-                }
+                    "max_tokens": 300,
+                },
             )
 
             result = response.json()
@@ -244,10 +252,16 @@ Responda apenas com o corpo revisado."""
             "category": category,
             "confidence": confidence,
             "rationale": rationale,
-            "meta": {"model": "heuristic_fallback", "cost": 0.0, "fallback": True}
+            "meta": {
+                "model": "heuristic_fallback",
+                "cost": 0.0,
+                "fallback": True,
+            },
         }
 
-    async def _generate_reply_huggingface(self, text: str, category: str, tone: str) -> str:
+    async def _generate_reply_huggingface(
+        self, text: str, category: str, tone: str
+    ) -> str:
         """Generate reply using HuggingFace"""
         return self._generate_reply_fallback(category, tone)
 
@@ -259,27 +273,39 @@ Responda apenas com o corpo revisado."""
         """Fallback reply generation"""
         if category == "Produtivo":
             if tone == "formal":
-                return ("Prezado(a),\n\nRecebemos sua solicitação e ela será analisada pela nossa equipe. "
-                        "Para melhor atendimento, favor informar o número do protocolo caso já possua. "
-                        "Retornaremos em até 24 horas úteis.\n\nAtenciosamente,\nEquipe de Suporte")
+                return (
+                    "Prezado(a),\n\nRecebemos sua solicitação e ela será analisada pela nossa equipe. "
+                    "Para melhor atendimento, favor informar o número do protocolo caso já possua. "
+                    "Retornaremos em até 24 horas úteis.\n\nAtenciosamente,\nEquipe de Suporte"
+                )
             elif tone == "amigavel":
-                return ("Olá! 😊\n\nObrigado por entrar em contato! Sua mensagem já chegou aqui e vamos "
-                        "analisar com cuidado. Se tiver algum número de protocolo, pode compartilhar que "
-                        "vai acelerar o processo. Voltamos a falar em breve!\n\nUm abraço,\nTime de Suporte")
+                return (
+                    "Olá! 😊\n\nObrigado por entrar em contato! Sua mensagem já chegou aqui e vamos "
+                    "analisar com cuidado. Se tiver algum número de protocolo, pode compartilhar que "
+                    "vai acelerar o processo. Voltamos a falar em breve!\n\nUm abraço,\nTime de Suporte"
+                )
             else:
-                return ("Olá,\n\nSua solicitação foi recebida e será analisada. "
-                        "Caso tenha número de protocolo, informe para agilizar o atendimento. "
-                        "Prazo de resposta: até 24h úteis.\n\nSaúde,\nSuporte")
+                return (
+                    "Olá,\n\nSua solicitação foi recebida e será analisada. "
+                    "Caso tenha número de protocolo, informe para agilizar o atendimento. "
+                    "Prazo de resposta: até 24h úteis.\n\nSaúde,\nSuporte"
+                )
         else:
             if tone == "formal":
-                return ("Prezado(a),\n\nAgradecemos pelo contato e pela confiança em nossos serviços. "
-                        "Sua mensagem foi muito importante para nós.\n\nAtenciosamente,\nEquipe")
+                return (
+                    "Prezado(a),\n\nAgradecemos pelo contato e pela confiança em nossos serviços. "
+                    "Sua mensagem foi muito importante para nós.\n\nAtenciosamente,\nEquipe"
+                )
             elif tone == "amigavel":
-                return ("Oi! 😊\n\nQue legal receber sua mensagem! Obrigado pelas palavras, "
-                        "ficamos muito felizes. Continue sempre em contato!\n\nUm abraço,\nTime")
+                return (
+                    "Oi! 😊\n\nQue legal receber sua mensagem! Obrigado pelas palavras, "
+                    "ficamos muito felizes. Continue sempre em contato!\n\nUm abraço,\nTime"
+                )
             else:
-                return ("Olá,\n\nObrigado pelo contato. Sua mensagem foi recebida "
-                        "e muito apreciada.\n\nSaudações,\nEquipe")
+                return (
+                    "Olá,\n\nObrigado pelo contato. Sua mensagem foi recebida "
+                    "e muito apreciada.\n\nSaudações,\nEquipe"
+                )
 
     def _estimate_cost(self, usage: Dict) -> float:
         """Estimate API call cost"""
@@ -292,10 +318,11 @@ Responda apenas com o corpo revisado."""
 
         # Example rates per 1K tokens
         input_rate = 0.00015  # $0.15 per 1K tokens
-        output_rate = 0.0006   # $0.60 per 1K tokens
+        output_rate = 0.0006  # $0.60 per 1K tokens
 
-        cost = (input_tokens * input_rate / 1000) + \
-            (output_tokens * output_rate / 1000)
+        cost = (input_tokens * input_rate / 1000) + (
+            output_tokens * output_rate / 1000
+        )
         return round(cost, 6)
 
     def _calculate_confidence(self, text: str, result: dict) -> float:
@@ -303,42 +330,55 @@ Responda apenas com o corpo revisado."""
         Calculate confidence score based on text and classification
         """
         confidence_factors = {
-            'clear_keywords': 0.3,
-            'text_length': 0.2,
-            'rationale_quality': 0.3,
-            'category_certainty': 0.2
+            "clear_keywords": 0.3,
+            "text_length": 0.2,
+            "rationale_quality": 0.3,
+            "category_certainty": 0.2,
         }
 
         score = 0.0
 
         # Check for clear keywords
-        produtivo_keywords = ['problema', 'erro', 'ajuda', 'suporte',
-                              'acesso', 'protocolo', 'chamado']
-        improdutivo_keywords = ['obrigado', 'parabéns', 'feliz',
-                                'agradecimento']
+        produtivo_keywords = [
+            "problema",
+            "erro",
+            "ajuda",
+            "suporte",
+            "acesso",
+            "protocolo",
+            "chamado",
+        ]
+        improdutivo_keywords = [
+            "obrigado",
+            "parabéns",
+            "feliz",
+            "agradecimento",
+        ]
 
         text_lower = text.lower()
         if any(kw in text_lower for kw in produtivo_keywords):
-            score += confidence_factors['clear_keywords']
+            score += confidence_factors["clear_keywords"]
         elif any(kw in text_lower for kw in improdutivo_keywords):
-            score += confidence_factors['clear_keywords']
+            score += confidence_factors["clear_keywords"]
 
         # Text length factor (medium length texts are more reliable)
         word_count = len(text.split())
         if 10 <= word_count <= 100:
-            score += confidence_factors['text_length']
+            score += confidence_factors["text_length"]
 
         # Rationale quality (length as proxy)
-        rationale = result.get('rationale', '')
+        rationale = result.get("rationale", "")
         if len(rationale) > 20:
-            score += confidence_factors['rationale_quality']
+            score += confidence_factors["rationale_quality"]
 
         # Always add base category certainty
-        score += confidence_factors['category_certainty']
+        score += confidence_factors["category_certainty"]
 
         return min(1.0, score)
 
-    async def _classify_openai_with_prompt(self, prompt: str) -> Dict[str, Any]:
+    async def _classify_openai_with_prompt(
+        self, prompt: str
+    ) -> Dict[str, Any]:
         """
         OpenAI classification with custom prompt
         """
@@ -366,12 +406,15 @@ Responda apenas com o corpo revisado."""
                     result["meta"] = {
                         "model": settings.model_name,
                         "cost": self._estimate_cost(data.get("usage", {})),
-                        "fallback": False
+                        "fallback": False,
                     }
                     return result
                 except json.JSONDecodeError:
                     logger.warning("Invalid JSON response from OpenAI")
-                    return {"category": "Produtivo", "rationale": "Erro na resposta"}
+                    return {
+                        "category": "Produtivo",
+                        "rationale": "Erro na resposta",
+                    }
 
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")

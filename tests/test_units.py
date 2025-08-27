@@ -2,6 +2,7 @@
 Testes unitários abrangentes para o sistema AutoU - Classificador de E-mails
 Testa componentes individuais: NLP, AI, utils, heuristics
 """
+
 import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
@@ -9,11 +10,18 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from app.services.ai import AIProvider
-from app.services.heuristics import (classify_heuristic,
-                                     get_classification_confidence)
+from app.services.heuristics import (
+    classify_heuristic,
+    get_classification_confidence,
+)
+
 # Import das classes a serem testadas
-from app.services.nlp import (clean_text, detect_language, extract_keywords,
-                              preprocess_text)
+from app.services.nlp import (
+    clean_text,
+    detect_language,
+    extract_keywords,
+    preprocess_text,
+)
 from app.utils.pdf import extract_text_from_pdf, validate_pdf
 from app.utils.txt import extract_text_from_txt, validate_txt
 
@@ -63,7 +71,9 @@ Assinatura"""
 
     def test_extract_keywords_productive_terms(self):
         """Testa extração de palavras-chave produtivas"""
-        productive_text = "Preciso de suporte para resolver erro urgente no sistema"
+        productive_text = (
+            "Preciso de suporte para resolver erro urgente no sistema"
+        )
         keywords = extract_keywords(productive_text)
 
         expected_keywords = ["suporte", "erro", "urgente", "sistema"]
@@ -92,7 +102,9 @@ class TestHeuristicsUnits:
 
     def test_classify_heuristic_productive_high_weight(self):
         """Testa classificação heurística com termos de alto peso"""
-        productive_text = "Problema urgente no sistema, protocolo 12345, preciso suporte"
+        productive_text = (
+            "Problema urgente no sistema, protocolo 12345, preciso suporte"
+        )
         category, confidence, rationale = classify_heuristic(productive_text)
 
         assert category == "Produtivo"
@@ -124,9 +136,12 @@ class TestHeuristicsUnits:
 
     def test_get_classification_confidence_with_keywords(self):
         """Testa cálculo de confiança com palavras-chave"""
-        text_with_keywords = "Preciso de suporte para resolver problema no sistema"
+        text_with_keywords = (
+            "Preciso de suporte para resolver problema no sistema"
+        )
         confidence = get_classification_confidence(
-            "Produtivo", text_with_keywords)
+            "Produtivo", text_with_keywords
+        )
 
         assert 0.5 <= confidence <= 0.9
         assert confidence > 0.5  # Deve ser maior que base devido às keywords
@@ -147,21 +162,26 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_openai_success(self):
         """Testa classificação OpenAI com sucesso"""
-        with patch('app.services.ai.settings.openai_api_key', 'test_key'), \
-                patch('httpx.AsyncClient') as mock_client:
+        with patch(
+            "app.services.ai.settings.openai_api_key", "test_key"
+        ), patch("httpx.AsyncClient") as mock_client:
             # Mock da resposta da API
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
-                "choices": [{
-                    "message": {
-                        "content": '{"category":"Produtivo","rationale":"Solicitação de suporte"}'
+                "choices": [
+                    {
+                        "message": {
+                            "content": '{"category":"Produtivo","rationale":"Solicitação de suporte"}'
+                        }
                     }
-                }],
-                "usage": {"prompt_tokens": 50, "completion_tokens": 20}
+                ],
+                "usage": {"prompt_tokens": 50, "completion_tokens": 20},
             }
 
-            mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+            mock_client.return_value.__aenter__.return_value.post.return_value = (
+                mock_response
+            )
 
             ai_provider = AIProvider()
             result = await ai_provider._classify_openai("Preciso de ajuda")
@@ -173,12 +193,14 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_openai_api_error(self):
         """Testa tratamento de erro da API OpenAI"""
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             # Mock de erro da API
             mock_response = Mock()
             mock_response.status_code = 500
 
-            mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+            mock_client.return_value.__aenter__.return_value.post.return_value = (
+                mock_response
+            )
 
             ai_provider = AIProvider()
 
@@ -190,19 +212,20 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_invalid_json_response(self):
         """Testa resposta JSON inválida da OpenAI"""
-        with patch('app.services.ai.settings.openai_api_key', 'test_key'), \
-                patch('httpx.AsyncClient') as mock_client:
+        with patch(
+            "app.services.ai.settings.openai_api_key", "test_key"
+        ), patch("httpx.AsyncClient") as mock_client:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
-                "choices": [{
-                    "message": {
-                        "content": "Resposta inválida não JSON"
-                    }
-                }]
+                "choices": [
+                    {"message": {"content": "Resposta inválida não JSON"}}
+                ]
             }
 
-            mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+            mock_client.return_value.__aenter__.return_value.post.return_value = (
+                mock_response
+            )
 
             ai_provider = AIProvider()
             result = await ai_provider._classify_openai("Teste")
@@ -215,21 +238,27 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_generate_reply_openai_success(self):
         """Testa geração de resposta OpenAI"""
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
-                "choices": [{
-                    "message": {
-                        "content": "Prezado(a), recebemos sua solicitação..."
+                "choices": [
+                    {
+                        "message": {
+                            "content": "Prezado(a), recebemos sua solicitação..."
+                        }
                     }
-                }]
+                ]
             }
 
-            mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+            mock_client.return_value.__aenter__.return_value.post.return_value = (
+                mock_response
+            )
 
             ai_provider = AIProvider()
-            reply = await ai_provider._generate_reply_openai("Preciso de ajuda", "Produtivo", "formal")
+            reply = await ai_provider._generate_reply_openai(
+                "Preciso de ajuda", "Produtivo", "formal"
+            )
 
             assert "Prezado" in reply
             assert len(reply) > 0
@@ -249,15 +278,12 @@ class TestAIProviderUnits:
         reply = ai_provider._generate_reply_fallback("Improdutivo", "amigavel")
 
         assert "😊" in reply
-        assert ("obrigado" in reply.lower() or "legal" in reply.lower())
+        assert "obrigado" in reply.lower() or "legal" in reply.lower()
 
     def test_estimate_cost_calculation(self):
         """Testa cálculo de custo da API"""
         ai_provider = AIProvider()
-        usage = {
-            "prompt_tokens": 100,
-            "completion_tokens": 50
-        }
+        usage = {"prompt_tokens": 100, "completion_tokens": 50}
 
         cost = ai_provider._estimate_cost(usage)
         assert cost > 0
@@ -270,7 +296,7 @@ class TestUtilsUnits:
 
     def test_extract_text_from_txt_utf8(self):
         """Testa extração de texto UTF-8"""
-        content = "Texto com acentuação: ção, ã, é".encode('utf-8')
+        content = "Texto com acentuação: ção, ã, é".encode("utf-8")
         result = extract_text_from_txt(content)
 
         assert result is not None
@@ -279,7 +305,7 @@ class TestUtilsUnits:
 
     def test_extract_text_from_txt_latin1(self):
         """Testa extração de texto Latin-1"""
-        content = "Texto simples".encode('latin-1')
+        content = "Texto simples".encode("latin-1")
         result = extract_text_from_txt(content)
 
         assert result is not None
@@ -292,12 +318,12 @@ class TestUtilsUnits:
 
     def test_validate_txt_valid_utf8(self):
         """Testa validação de TXT UTF-8 válido"""
-        content = "Texto válido".encode('utf-8')
+        content = "Texto válido".encode("utf-8")
         assert validate_txt(content) is True
 
     def test_validate_txt_valid_latin1(self):
         """Testa validação de TXT Latin-1 válido"""
-        content = "Texto válido".encode('latin-1')
+        content = "Texto válido".encode("latin-1")
         assert validate_txt(content) is True
 
     def test_validate_pdf_invalid_content(self):
@@ -329,14 +355,15 @@ class TestConfigurationUnits:
         assert settings.ai_timeout > 0
         assert settings.port > 0
 
-    @patch.dict('os.environ', {'PROVIDER': 'HF', 'MAX_INPUT_CHARS': '3000'})
+    @patch.dict("os.environ", {"PROVIDER": "HF", "MAX_INPUT_CHARS": "3000"})
     def test_settings_environment_override(self):
         """Testa override de configurações via environment"""
         # Recarregar settings com novas variáveis de ambiente
         from app.core.config import Settings
+
         test_settings = Settings()
 
-        assert test_settings.provider == 'HF'
+        assert test_settings.provider == "HF"
         assert test_settings.max_input_chars == 3000
 
 
@@ -349,9 +376,9 @@ class TestLoggingUnits:
 
         logger = get_logger("test")
         assert logger is not None
-        assert hasattr(logger, 'info')
-        assert hasattr(logger, 'error')
-        assert hasattr(logger, 'warning')
+        assert hasattr(logger, "info")
+        assert hasattr(logger, "error")
+        assert hasattr(logger, "warning")
 
     def test_structured_logger_json_output(self):
         """Testa saída JSON do logger"""
@@ -359,7 +386,7 @@ class TestLoggingUnits:
 
         from app.core.logger import StructuredLogger
 
-        with patch('logging.Logger.log') as mock_log:
+        with patch("logging.Logger.log") as mock_log:
             logger = StructuredLogger("test")
             logger.info("Test message", key="value")
 

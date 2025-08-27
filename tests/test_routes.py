@@ -35,7 +35,8 @@ def test_classify_too_long_text():
     """Test classification with text exceeding limit"""
     long_text = "a" * 6000  # Exceeds 5000 char limit
     response = client.post(
-        "/classify", data={"text": long_text, "tone": "neutro"})
+        "/classify", data={"text": long_text, "tone": "neutro"}
+    )
     assert response.status_code == 400
     error = response.json()
     assert "limite" in error["detail"].lower()
@@ -84,8 +85,7 @@ def test_classify_different_tones():
 
 def test_refine_empty_text():
     """Test refinement with empty text"""
-    response = client.post("/refine",
-                           json={"text": "", "tone": "formal"})
+    response = client.post("/refine", json={"text": "", "tone": "formal"})
     assert response.status_code == 400
     error = response.json()
     assert "muito curto" in error["detail"].lower()
@@ -94,8 +94,7 @@ def test_refine_empty_text():
 def test_refine_valid_text():
     """Test refinement with valid text"""
     text = "Obrigado pelo contato. Vamos analisar sua solicitação."
-    response = client.post("/refine",
-                           json={"text": text, "tone": "amigavel"})
+    response = client.post("/refine", json={"text": text, "tone": "amigavel"})
 
     # Should succeed or fail gracefully
     if response.status_code == 200:
@@ -112,9 +111,9 @@ def test_classify_with_invalid_file():
     # Create a fake file
     fake_file = ("test.pdf", b"not a real pdf", "application/pdf")
 
-    response = client.post("/classify",
-                           data={"tone": "neutro"},
-                           files={"file": fake_file})
+    response = client.post(
+        "/classify", data={"tone": "neutro"}, files={"file": fake_file}
+    )
 
     assert response.status_code == 400
 
@@ -125,9 +124,9 @@ def test_classify_with_oversized_file():
     large_content = b"a" * (3 * 1024 * 1024)  # 3MB
     fake_file = ("large.txt", large_content, "text/plain")
 
-    response = client.post("/classify",
-                           data={"tone": "neutro"},
-                           files={"file": fake_file})
+    response = client.post(
+        "/classify", data={"tone": "neutro"}, files={"file": fake_file}
+    )
 
     assert response.status_code == 400
     error = response.json()

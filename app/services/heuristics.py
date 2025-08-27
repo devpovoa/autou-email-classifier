@@ -1,5 +1,4 @@
-import re
-from typing import List, Tuple
+from typing import Tuple
 
 from app.core.logger import get_logger
 
@@ -18,32 +17,82 @@ def classify_heuristic(text: str) -> Tuple[str, float, str]:
 
     # High-weight productive terms
     high_weight_terms = [
-        'suporte', 'chamado', 'ticket', 'protocolo', 'erro', 'bug',
-        'problema', 'falha', 'urgente', 'bloqueio', 'travado',
-        'status', 'situação', 'andamento', 'prazo', 'vencimento',
-        'fatura', 'cobrança', 'pagamento', 'débito', 'crédito',
-        'acesso', 'senha', 'login', 'usuário', 'permissão',
-        'sistema', 'plataforma', 'funcionalidade', 'recurso'
+        "suporte",
+        "chamado",
+        "ticket",
+        "protocolo",
+        "erro",
+        "bug",
+        "problema",
+        "falha",
+        "urgente",
+        "bloqueio",
+        "travado",
+        "status",
+        "situação",
+        "andamento",
+        "prazo",
+        "vencimento",
+        "fatura",
+        "cobrança",
+        "pagamento",
+        "débito",
+        "crédito",
+        "acesso",
+        "senha",
+        "login",
+        "usuário",
+        "permissão",
+        "sistema",
+        "plataforma",
+        "funcionalidade",
+        "recurso",
     ]
 
     # Medium-weight productive terms
     medium_weight_terms = [
-        'dúvida', 'pergunta', 'informação', 'esclarecimento',
-        'solicitação', 'pedido', 'requisição', 'configuração',
-        'instalação', 'atualização', 'versão', 'compatibility'
+        "dúvida",
+        "pergunta",
+        "informação",
+        "esclarecimento",
+        "solicitação",
+        "pedido",
+        "requisição",
+        "configuração",
+        "instalação",
+        "atualização",
+        "versão",
+        "compatibility",
     ]
 
     # Low-weight terms (slightly productive)
     low_weight_terms = [
-        'questão', 'assunto', 'tópico', 'sobre', 'referente',
-        'preciso', 'necessário', 'importante', 'ajuda'
+        "questão",
+        "assunto",
+        "tópico",
+        "sobre",
+        "referente",
+        "preciso",
+        "necessário",
+        "importante",
+        "ajuda",
     ]
 
     # Improdutive indicators
     improdutive_terms = [
-        'parabéns', 'felicitações', 'agradecimento', 'obrigado',
-        'obrigada', 'gratidão', 'sucesso', 'feliz', 'satisfeito',
-        'excelente', 'ótimo', 'bom trabalho', 'bem feito'
+        "parabéns",
+        "felicitações",
+        "agradecimento",
+        "obrigado",
+        "obrigada",
+        "gratidão",
+        "sucesso",
+        "feliz",
+        "satisfeito",
+        "excelente",
+        "ótimo",
+        "bom trabalho",
+        "bem feito",
     ]
 
     # Calculate scores
@@ -51,7 +100,8 @@ def classify_heuristic(text: str) -> Tuple[str, float, str]:
     medium_score = sum(2 for term in medium_weight_terms if term in text_lower)
     low_score = sum(1 for term in low_weight_terms if term in text_lower)
     improdutive_score = sum(
-        2 for term in improdutive_terms if term in text_lower)
+        2 for term in improdutive_terms if term in text_lower
+    )
 
     productive_score = high_score + medium_score + low_score
 
@@ -89,8 +139,20 @@ def get_classification_confidence(category: str, text: str) -> float:
     length_factor = min(len(text) / 1000, 0.2)
 
     # Keywords density
-    keywords_found = len([term for term in ['suporte', 'problema', 'erro', 'ajuda',
-                                            'dúvida', 'status'] if term in text.lower()])
+    keywords_found = len(
+        [
+            term
+            for term in [
+                "suporte",
+                "problema",
+                "erro",
+                "ajuda",
+                "dúvida",
+                "status",
+            ]
+            if term in text.lower()
+        ]
+    )
     keyword_factor = min(keywords_found * 0.1, 0.3)
 
     return min(base_confidence + length_factor + keyword_factor, 0.9)
