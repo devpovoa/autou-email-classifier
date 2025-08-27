@@ -12,8 +12,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 def create_app() -> FastAPI:
     app = FastAPI(
         title="AutoU - Classificador de E-mails",
-        description="Sistema inteligente de classificação e resposta automática "
-        "de e-mails",
+        description="Sistema inteligente de classificação e resposta "
+        " automática de e-mails",
         version="1.0.0",
     )
 

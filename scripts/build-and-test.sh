@@ -115,10 +115,10 @@ build_image() {
 run_lint() {
     log INFO "Running code quality checks..."
     
-    if command -v docker-compose &> /dev/null; then
-        docker-compose --profile lint run --rm lint
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        docker compose --profile lint run --rm lint
     else
-        log WARNING "docker-compose not found, running lint in Docker..."
+        log WARNING "docker compose not found, running lint in Docker..."
         docker run --rm -v "$(pwd):/app" autou-classifier:development \
             sh -c "pip install flake8 black isort && \
                    black --check app/ tests/ main.py && \

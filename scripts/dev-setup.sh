@@ -50,8 +50,9 @@ check_requirements() {
         missing_tools+=("docker")
     fi
     
-    if ! command_exists docker-compose; then
-        missing_tools+=("docker-compose")
+    # Check for Docker Compose
+    if ! docker compose version &> /dev/null; then
+        missing_tools+=("docker compose plugin")
     fi
     
     if ! command_exists curl; then
@@ -151,7 +152,7 @@ setup_git_hooks() {
 echo "Running pre-commit checks..."
 
 # Run linting
-docker-compose --profile lint run --rm lint
+docker compose --profile lint run --rm lint
 
 if [ $? -ne 0 ]; then
     echo "Pre-commit checks failed. Please fix the issues before committing."
@@ -176,7 +177,7 @@ build_development() {
     docker pull python:3.12-slim
     
     # Build development image
-    docker-compose build app-dev
+    docker compose build app-dev
     
     if [ $? -eq 0 ]; then
         log SUCCESS "Development environment built successfully"
@@ -191,7 +192,7 @@ verify_setup() {
     log INFO "Running verification tests..."
     
     # Run tests to make sure everything works
-    docker-compose --profile test run --rm test
+    docker compose --profile test run --rm test
     
     if [ $? -eq 0 ]; then
         log SUCCESS "Setup verification completed successfully"
@@ -209,13 +210,13 @@ show_usage() {
     echo -e "${BLUE}Quick Start Commands:${NC}"
     echo ""
     echo "  Start development server:"
-    echo "    docker-compose up app-dev"
+    echo "    docker compose up app-dev"
     echo ""
     echo "  Run tests:"
-    echo "    docker-compose --profile test run --rm test"
+    echo "    docker compose --profile test run --rm test"
     echo ""
     echo "  Run linting:"
-    echo "    docker-compose --profile lint run --rm lint"
+    echo "    docker compose --profile lint run --rm lint"
     echo ""
     echo "  Run all tests and linting:"
     echo "    ./scripts/build-and-test.sh --lint"
@@ -225,14 +226,14 @@ show_usage() {
     echo ""
     echo -e "${YELLOW}Next Steps:${NC}"
     echo "1. Edit .env file and add your OpenAI API key"
-    echo "2. Start the development server: docker-compose up app-dev"
+    echo "2. Start the development server: docker compose up app-dev"
     echo "3. Open http://localhost:8000 in your browser"
     echo "4. Start developing!"
     echo ""
     echo -e "${BLUE}Useful Commands:${NC}"
-    echo "  View logs: docker-compose logs -f app-dev"
-    echo "  Rebuild: docker-compose build app-dev"
-    echo "  Clean up: docker-compose down --volumes"
+    echo "  View logs: docker compose logs -f app-dev"
+    echo "  Rebuild: docker compose build app-dev"
+    echo "  Clean up: docker compose down --volumes"
 }
 
 # Main execution

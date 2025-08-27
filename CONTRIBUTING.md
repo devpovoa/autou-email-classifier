@@ -27,7 +27,7 @@ cp .env.example .env
 
 3. **Inicie o ambiente de desenvolvimento**:
 ```bash
-docker-compose up app-dev
+docker compose up app-dev
 ```
 
 ## 📋 Padrões de Desenvolvimento
@@ -79,7 +79,7 @@ docker-compose up app-dev
 
    ```bash
    # Aplicar formatação
-   docker-compose --profile lint run --rm lint
+   docker compose --profile lint run --rm lint
    ```
 
 2. **Estrutura de Código**:
@@ -206,7 +206,7 @@ tests/
 
 ```bash
 # Todos os testes
-docker-compose --profile test run --rm test
+docker compose --profile test run --rm test
 
 # Testes específicos
 pytest tests/test_units.py::test_specific_function -v
@@ -237,13 +237,13 @@ docker build --target production -t autou-classifier:prod .
 
 ```bash
 # Desenvolvimento
-docker-compose up app-dev
+docker compose up app-dev
 
 # Testes
-docker-compose --profile test run --rm test
+docker compose --profile test run --rm test
 
 # Linting
-docker-compose --profile lint run --rm lint
+docker compose --profile lint run --rm lint
 ```
 
 ## 📚 Documentação
