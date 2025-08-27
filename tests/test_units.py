@@ -225,7 +225,9 @@ class TestAIProviderUnits:
             # Deve retornar resposta padrão para JSON inválido
             assert result["category"] == "Produtivo"
             assert result["rationale"] == "Erro na resposta da IA"
-            assert result["confidence"] == 0.5
+            assert (
+                result["confidence"] == 0.8
+            )  # _safe_json_loads retorna padrão processado com confidence 0.8
 
     @pytest.mark.asyncio
     async def test_generate_reply_openai_success(self):

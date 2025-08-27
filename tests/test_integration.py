@@ -182,19 +182,23 @@ class TestFullWorkflowIntegration:
 
     def test_ai_failure_fallback_integration(self):
         """Testa o fallback quando a IA falha"""
-        # Sem mockar - deixar o sistema usar fallback naturalmente quando OpenAI
-        # não configurado
+        # Mock para forçar falha na API OpenAI e ativar fallback
+        with patch("app.services.ai.httpx.AsyncClient") as mock_client:
+            # Simular falha na conexão HTTP
+            mock_client.side_effect = Exception("Connection failed")
 
-        # Email com palavras-chave produtivas
-        email_text = "Preciso de suporte urgente para resolver erro no sistema"
+            # Email com palavras-chave produtivas
+            email_text = "Preciso de suporte urgente para resolver erro no sistema"
 
-        response = client.post("/classify", data={"text": email_text, "tone": "neutro"})
+            response = client.post(
+                "/classify", data={"text": email_text, "tone": "neutro"}
+            )
 
-        # Deve usar fallback heurístico e retornar 200
-        assert response.status_code == 200
-        result = response.json()
-        assert result["category"] in ["Produtivo", "Improdutivo"]
-        assert result["meta"]["fallback"] is True
+            # Deve usar fallback heurístico e retornar 200
+            assert response.status_code == 200
+            result = response.json()
+            assert result["category"] in ["Produtivo", "Improdutivo"]
+            assert result["meta"]["fallback"] is True
 
 
 class TestNLPIntegration:
