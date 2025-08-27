@@ -118,7 +118,7 @@ E-mail:
 \"\"\"{text}\"\"\"
 
 Responda APENAS em JSON válido:
-{"category":"Produtivo|Improdutivo","rationale":"<motivo curto objetivo>"} """
+{{"category":"Produtivo|Improdutivo","rationale":"<motivo curto objetivo>"}} """
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.post(

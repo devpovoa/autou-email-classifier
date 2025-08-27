@@ -233,8 +233,7 @@ async def classify_email(
         if len(email_text) > settings.max_input_chars:
             raise HTTPException(
                 status_code=400,
-                detail=f"Texto excede o limite de {
-                    settings.max_input_chars} caracteres",
+                detail=f"Texto excede o limite de {settings.max_input_chars} caracteres",
             )
 
         # Preprocess text
