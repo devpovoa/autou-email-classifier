@@ -123,7 +123,7 @@ run_lint() {
             sh -c "pip install flake8 black isort && \
                    black --check app/ tests/ main.py && \
                    isort --check-only app/ tests/ main.py && \
-                   flake8 app/ tests/ main.py --max-line-length=88"
+                   flake8 app/ tests/ main.py"
     fi
     
     if [ $? -eq 0 ]; then

@@ -84,7 +84,7 @@ services:
         echo '=== Running isort ===' &&
         /home/app/.local/bin/isort --profile black --check-only app/ tests/ main.py &&
         echo '=== Running flake8 ===' &&
-        /home/app/.local/bin/flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503,E501
+        /home/app/.local/bin/flake8 app/ tests/ main.py
       "
     profiles:
       - lint

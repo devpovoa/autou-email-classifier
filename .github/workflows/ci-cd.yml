@@ -50,7 +50,7 @@ jobs:
         run: isort --profile black --check-only --diff app/ tests/ main.py
 
       - name: Run flake8
-        run: flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503
+        run: flake8 app/ tests/ main.py
 
   # Job de Testes Unitários
   test:
