@@ -25,7 +25,7 @@ async def test_classify_empty_text(client):
     response = await client.post("/classify", data={"text": "", "tone": "neutro"})
     assert response.status_code == 400
     error = response.json()
-    assert "nenhum texto ou arquivo" in error["detail"].lower()
+    assert "necessário fornecer texto" in error["detail"].lower()
 
 
 @pytest.mark.anyio
