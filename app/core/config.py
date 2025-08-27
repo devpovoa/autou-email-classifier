@@ -20,6 +20,19 @@ class Settings(BaseSettings):
     max_input_chars: int = 5000
     max_file_size: int = 2 * 1024 * 1024  # 2MB
 
+    # JWT Security Settings
+    jwt_secret_key: str = "your-secret-key-change-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 1440  # 24 hours
+    jwt_refresh_token_expire_days: int = 7  # 7 days
+    
+    # API Security
+    enable_auth: bool = True
+    api_key_header: str = "X-API-Key"
+    default_api_key: Optional[str] = None
+    rate_limit_requests: int = 100
+    rate_limit_window: int = 3600  # 1 hour
+
     # AI Configuration
     use_heuristic_fallback: bool = True
     confidence_threshold: float = 0.7
