@@ -52,6 +52,40 @@ class RefineRequest(BaseModel):
     tone: str
 
 
+class ClassificationMeta(BaseModel):
+    model: str
+    cost: float = 0.0
+    fallback: bool = False
+
+
+class ClassificationResponse(BaseModel):
+    category: str
+    confidence: float
+    rationale: str
+    meta: ClassificationMeta
+    latency_ms: int
+
+
+class ClassifyResponse(ClassificationResponse):
+    reply: str
+
+
+class RefineResponse(BaseModel):
+    reply: str
+    latency_ms: int
+
+
+class APIClassificationResponse(ClassificationResponse):
+    user: str
+    timestamp: str
+    filename: Optional[str] = None
+
+
+class LegacyClassificationResponse(ClassificationResponse):
+    auth_method: str
+    timestamp: str
+
+
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Main page"""
@@ -107,7 +141,7 @@ async def get_me(current_user: User = Depends(get_current_active_user)):
 
 
 # Protected classification endpoints
-@router.post("/api/classify/text")
+@router.post("/api/classify/text", response_model=APIClassificationResponse)
 async def classify_text_api(
     request: ClassifyRequest,
     current_user: User = Depends(require_scopes("classify:read")),
@@ -138,11 +172,19 @@ async def classify_text_api(
         return result
 
     except Exception as e:
-        logger.error(f"Classification error for user {current_user.username}: {e}")
-        raise HTTPException(status_code=500, detail="Classification failed")
+        logger.error(
+            "Classification error for authenticated user",
+            extra={
+                "user": current_user.username,
+                "error": str(e),
+                "text_length": len(request.text),
+            },
+            exc_info=True,
+        )
+        raise HTTPException(status_code=500, detail="Erro na classificação")
 
 
-@router.post("/api/classify/file")
+@router.post("/api/classify/file", response_model=APIClassificationResponse)
 async def classify_file_api(
     file: UploadFile = File(...),
     current_user: User = Depends(require_scopes("classify:read")),
@@ -174,12 +216,20 @@ async def classify_file_api(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"File classification error for user {current_user.username}: {e}")
-        raise HTTPException(status_code=500, detail="File classification failed")
+        logger.error(
+            "File classification error for authenticated user",
+            extra={
+                "user": current_user.username,
+                "filename": file.filename,
+                "error": str(e),
+            },
+            exc_info=True,
+        )
+        raise HTTPException(status_code=500, detail="Erro na classificação do arquivo")
 
 
 # Alternative API key authentication (for legacy systems)
-@router.post("/api/v1/classify")
+@router.post("/api/v1/classify", response_model=LegacyClassificationResponse)
 async def classify_with_api_key(
     request: ClassifyRequest, api_key: str = Depends(api_key_auth)
 ):
@@ -208,11 +258,15 @@ async def classify_with_api_key(
         return result
 
     except Exception as e:
-        logger.error(f"API key classification error: {e}")
-        raise HTTPException(status_code=500, detail="Classification failed")
+        logger.error(
+            "API key classification error",
+            extra={"error": str(e), "text_length": len(request.text)},
+            exc_info=True,
+        )
+        raise HTTPException(status_code=500, detail="Erro na classificação")
 
 
-@router.post("/classify")
+@router.post("/classify", response_model=ClassifyResponse)
 async def classify_email(
     request: Request,
     text: Optional[str] = Form(None),
@@ -278,11 +332,19 @@ async def classify_email(
         raise
     except Exception as e:
         latency_ms = max(1, round((time.time() - start_time) * 1000))
-        logger.error("Classification failed", error=str(e), latency_ms=latency_ms)
+        logger.error(
+            "Classification failed",
+            extra={
+                "error": str(e),
+                "latency_ms": latency_ms,
+                "text_length": len(email_text) if "email_text" in locals() else 0,
+            },
+            exc_info=True,
+        )
         raise HTTPException(status_code=500, detail="Erro interno do servidor")
 
 
-@router.post("/refine")
+@router.post("/refine", response_model=RefineResponse)
 async def refine_reply(request: RefineRequest):
     """Refine existing reply with new tone"""
     start_time = time.time()
@@ -312,7 +374,16 @@ async def refine_reply(request: RefineRequest):
         raise
     except Exception as e:
         latency_ms = round((time.time() - start_time) * 1000)
-        logger.error("Reply refinement failed", error=str(e), latency_ms=latency_ms)
+        logger.error(
+            "Reply refinement failed",
+            extra={
+                "error": str(e),
+                "latency_ms": latency_ms,
+                "original_length": len(request.text),
+                "tone": request.tone,
+            },
+            exc_info=True,
+        )
         raise HTTPException(status_code=500, detail="Erro ao refinar resposta")
 
 
@@ -323,8 +394,10 @@ async def _extract_text(form_text: Optional[str], file: Optional[UploadFile]) ->
         return form_text.strip()
 
     if file and file.filename:
-        # Check file size
+        # Read file content once
         file_content = await file.read()
+
+        # Check file size before processing
         if len(file_content) > settings.max_file_size:
             raise HTTPException(
                 status_code=400,
@@ -336,32 +409,39 @@ async def _extract_text(form_text: Optional[str], file: Optional[UploadFile]) ->
 
         if filename_lower.endswith(".pdf"):
             if not validate_pdf(file_content):
-                raise HTTPException(status_code=400, detail="Arquivo PDF inválido")
+                raise HTTPException(
+                    status_code=400, detail="Arquivo PDF inválido ou corrompido"
+                )
 
             text = extract_text_from_pdf(file_content)
-            if not text:
+            if not text or len(text.strip()) == 0:
                 raise HTTPException(
                     status_code=400,
                     detail="Não foi possível extrair texto do PDF",
                 )
-            return text
+            return text.strip()
 
         elif filename_lower.endswith((".txt", ".text")):
             if not validate_txt(file_content):
-                raise HTTPException(status_code=400, detail="Arquivo TXT inválido")
+                raise HTTPException(
+                    status_code=400, detail="Arquivo TXT inválido ou corrompido"
+                )
 
             text = extract_text_from_txt(file_content)
-            if not text:
+            if not text or len(text.strip()) == 0:
                 raise HTTPException(
                     status_code=400,
                     detail="Não foi possível extrair texto do arquivo",
                 )
-            return text
+            return text.strip()
 
         else:
             raise HTTPException(
                 status_code=400,
-                detail="Tipo de arquivo não suportado (apenas .txt e .pdf)",
+                detail="Formato de arquivo não suportado. Use apenas .txt ou .pdf",
             )
 
-    raise HTTPException(status_code=400, detail="Nenhum texto ou arquivo fornecido")
+    raise HTTPException(
+        status_code=400,
+        detail="É necessário fornecer texto ou fazer upload de um arquivo",
+    )
