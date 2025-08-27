@@ -48,11 +48,14 @@ services:
     volumes:
       - .:/app
       - ./coverage:/app/coverage
+    user: "1000:1000"
     command: >
       sh -c "
-        rm -f .coverage* &&
-        python -m pytest --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing -v ||
-        python -m pytest --cov=app --cov-report=term-missing -v
+        mkdir -p /tmp/coverage &&
+        export COVERAGE_FILE=/tmp/coverage/.coverage &&
+        rm -f /tmp/coverage/.coverage* &&
+        python -m pytest --cov=app --cov-report=term-missing --cov-report=html:/app/coverage --cov-report=xml:/app/coverage/coverage.xml -v || 
+        python -m pytest -v
       "
     profiles:
       - test

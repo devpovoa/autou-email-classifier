@@ -255,7 +255,12 @@ class TestResourceUsage:
         import gc
         import os
 
-        import psutil
+        try:
+            import psutil
+        except ImportError:
+            import pytest
+
+            pytest.skip("psutil não disponível - teste de memória ignorado")
 
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss
@@ -294,7 +299,12 @@ class TestResourceUsage:
 
     def test_cpu_usage_during_processing(self):
         """Testa uso de CPU durante processamento"""
-        import psutil
+        try:
+            import psutil
+        except ImportError:
+            import pytest
+
+            pytest.skip("psutil não disponível - teste de CPU ignorado")
 
         # Monitorar CPU antes
         _ = psutil.cpu_percent(interval=1)  # unused

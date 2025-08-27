@@ -1,11 +1,14 @@
 # Multi-stage build for optimal image size and CI/CD
 FROM python:3.12-slim AS base
 
-# Install system dependencies
+# Install system dependencies including psutil requirements
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     curl \
+    build-essential \
+    python3-dev \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
@@ -29,8 +32,8 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install additional test dependencies
-RUN pip install --no-cache-dir pytest-cov coverage pytest-xvfb
+# Install additional test dependencies (including psutil for monitoring)
+RUN pip install --no-cache-dir pytest-cov coverage pytest-xvfb psutil==6.1.1
 
 # Copy application code
 COPY . .
