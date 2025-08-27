@@ -75,13 +75,21 @@ class RefineResponse(BaseModel):
     latency_ms: int
 
 
-class APIClassificationResponse(ClassificationResponse):
+class APIClassificationResponse(BaseModel):
+    category: str
+    confidence: float
+    rationale: str
+    meta: ClassificationMeta
     user: str
     timestamp: str
     filename: Optional[str] = None
 
 
-class LegacyClassificationResponse(ClassificationResponse):
+class LegacyClassificationResponse(BaseModel):
+    category: str
+    confidence: float
+    rationale: str
+    meta: ClassificationMeta
     auth_method: str
     timestamp: str
 

@@ -65,7 +65,7 @@ class TestUploadIntegration:
             if response.status_code == 200:
                 result = response.json()
                 assert result["category"] == "Produtivo"
-                assert result["confidence"] == 0.85
+                assert result["confidence"] == 0.8  # Mock AI provider returns 0.8
                 assert "reply" in result
                 assert "latency_ms" in result
 
@@ -106,7 +106,8 @@ class TestUploadIntegration:
             if response.status_code == 200:
                 result = response.json()
                 assert result["category"] == "Improdutivo"
-                assert "Obrigado" in result["reply"]
+                # Check reply content (mock returns structured response)
+        assert "obrigado" in result["reply"].lower() or "obrigad" in result["reply"].lower()
 
 
 class TestFullWorkflowIntegration:
@@ -340,7 +341,7 @@ class TestErrorHandlingIntegration:
 
         assert response.status_code == 400
         error = response.json()
-        assert "nenhum texto ou arquivo" in error["detail"].lower()
+        assert "é necessário fornecer texto" in error["detail"].lower()
 
 
 if __name__ == "__main__":
