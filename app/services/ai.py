@@ -22,16 +22,12 @@ class AIProvider:
         try:
             if settings.provider == "OpenAI":
                 # Use optimized prompts
-                prompt = prompt_optimizer.get_optimized_classification_prompt(
-                    text
-                )
+                prompt = prompt_optimizer.get_optimized_classification_prompt(text)
                 result = await self._classify_openai_with_prompt(prompt)
 
                 # Add quality analysis
                 if result.get("category"):
-                    result["confidence"] = self._calculate_confidence(
-                        text, result
-                    )
+                    result["confidence"] = self._calculate_confidence(text, result)
 
                 return result
 
@@ -79,16 +75,13 @@ class AIProvider:
                 logger.info(f"Reply quality score: {quality['score']}")
                 if quality["needs_improvement"]:
                     logger.warning(
-                        "Reply quality below threshold, "
-                        "consider prompt refinement"
+                        "Reply quality below threshold, " "consider prompt refinement"
                     )
 
                 return reply
 
             elif settings.provider == "HF":
-                return await self._generate_reply_huggingface(
-                    text, category, tone
-                )
+                return await self._generate_reply_huggingface(text, category, tone)
             else:
                 return self._generate_reply_fallback(category, tone)
         except Exception as e:
@@ -174,9 +167,7 @@ Responda APENAS em JSON válido:
                     },
                 }
 
-    async def _generate_reply_openai(
-        self, text: str, category: str, tone: str
-    ) -> str:
+    async def _generate_reply_openai(self, text: str, category: str, tone: str) -> str:
         """Generate reply using OpenAI"""
         tone_map = {
             "formal": "formal",
@@ -320,9 +311,7 @@ Responda apenas com o corpo revisado."""
         input_rate = 0.00015  # $0.15 per 1K tokens
         output_rate = 0.0006  # $0.60 per 1K tokens
 
-        cost = (input_tokens * input_rate / 1000) + (
-            output_tokens * output_rate / 1000
-        )
+        cost = (input_tokens * input_rate / 1000) + (output_tokens * output_rate / 1000)
         return round(cost, 6)
 
     def _calculate_confidence(self, text: str, result: dict) -> float:
@@ -376,9 +365,7 @@ Responda apenas com o corpo revisado."""
 
         return min(1.0, score)
 
-    async def _classify_openai_with_prompt(
-        self, prompt: str
-    ) -> Dict[str, Any]:
+    async def _classify_openai_with_prompt(self, prompt: str) -> Dict[str, Any]:
         """
         OpenAI classification with custom prompt
         """

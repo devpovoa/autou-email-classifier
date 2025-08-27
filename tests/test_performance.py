@@ -4,12 +4,10 @@ Testes de performance e carga para o sistema AutoU
 Valida comportamento sob diferentes cargas de trabalho
 """
 
-import asyncio
 import concurrent.futures
 import time
 from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 from main import app
@@ -24,9 +22,7 @@ class TestPerformance:
         """Testa tempo de resposta para classificação única"""
         text = "Preciso de ajuda com problema no sistema"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -39,9 +35,9 @@ class TestPerformance:
             mock_reply.return_value = "Resposta automática"
 
             start_time = time.time()
-            response = client.post(
+            _ = client.post(
                 "/classify", data={"text": text, "tone": "neutro"}
-            )
+            )  # unused
             end_time = time.time()
 
             response_time = (end_time - start_time) * 1000  # em ms
@@ -58,9 +54,7 @@ class TestPerformance:
         """Testa manipulação de requisições concorrentes"""
         text = "Teste de concorrência"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -73,14 +67,10 @@ class TestPerformance:
             mock_reply.return_value = "Resposta"
 
             def make_request():
-                return client.post(
-                    "/classify", data={"text": text, "tone": "neutro"}
-                )
+                return client.post("/classify", data={"text": text, "tone": "neutro"})
 
             # Executar 10 requisições concorrentes
-            with concurrent.futures.ThreadPoolExecutor(
-                max_workers=10
-            ) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 futures = [executor.submit(make_request) for _ in range(10)]
                 results = [future.result() for future in futures]
 
@@ -93,9 +83,7 @@ class TestPerformance:
         # Texto próximo ao limite (4500 chars)
         large_text = "Este é um texto longo para testar performance. " * 90
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -108,7 +96,7 @@ class TestPerformance:
             mock_reply.return_value = "Processado com sucesso"
 
             start_time = time.time()
-            response = client.post(
+            _ = client.post(  # unused
                 "/classify", data={"text": large_text, "tone": "neutro"}
             )
             end_time = time.time()
@@ -123,9 +111,7 @@ class TestPerformance:
         """Testa uso de memória com múltiplos arquivos"""
         file_content = "Conteúdo de teste para arquivo " * 100
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -146,7 +132,7 @@ class TestPerformance:
                         "text/plain",
                     )
                 }
-                response = client.post(
+                _ = client.post(  # unused
                     "/classify", data={"tone": "neutro"}, files=files
                 )
 
@@ -181,9 +167,9 @@ class TestScalability:
             mock_classify.side_effect = Exception("API Error")
 
             start_time = time.time()
-            response = client.post(
+            _ = client.post(
                 "/classify", data={"text": text, "tone": "neutro"}
-            )
+            )  # unused
             end_time = time.time()
 
             fallback_time = (end_time - start_time) * 1000
@@ -209,7 +195,7 @@ class TestRobustness:
         ]
 
         for malformed_input in malformed_inputs:
-            response = client.post("/classify", data=malformed_input)
+            _ = client.post("/classify", data=malformed_input)  # unused
             # Deve retornar erro 400 para input inválido
             assert response.status_code == 400
 
@@ -224,9 +210,7 @@ class TestRobustness:
             "Texto com    espaços    extras",
         ]
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -239,7 +223,7 @@ class TestRobustness:
             mock_reply.return_value = "Processado"
 
             for special_text in special_texts:
-                response = client.post(
+                _ = client.post(  # unused
                     "/classify", data={"text": special_text, "tone": "neutro"}
                 )
 
@@ -250,15 +234,15 @@ class TestRobustness:
         """Testa valores limítrofes"""
         # Texto no limite exato
         limit_text = "a" * 5000  # Exatamente o limite
-        response = client.post(
+        _ = client.post(
             "/classify", data={"text": limit_text, "tone": "neutro"}
-        )
+        )  # unused
         # Pode dar 200 ou 400, mas não deve quebrar
         assert response.status_code in [200, 400]
 
         # Texto 1 char acima do limite
         over_limit_text = "a" * 5001
-        response = client.post(
+        _ = client.post(  # unused
             "/classify", data={"text": over_limit_text, "tone": "neutro"}
         )
         assert response.status_code == 400
@@ -281,9 +265,7 @@ class TestResourceUsage:
         for i in range(10):
             text = f"Teste de memória número {i} " * 50
 
-            with patch(
-                "app.services.ai.ai_provider.classify"
-            ) as mock_classify, patch(
+            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
                 "app.services.ai.ai_provider.generate_reply"
             ) as mock_reply:
 
@@ -299,7 +281,7 @@ class TestResourceUsage:
                 }
                 mock_reply.return_value = f"Resposta {i}"
 
-                response = client.post(
+                _ = client.post(  # unused
                     "/classify", data={"text": text, "tone": "neutro"}
                 )
 
@@ -317,13 +299,11 @@ class TestResourceUsage:
         import psutil
 
         # Monitorar CPU antes
-        cpu_before = psutil.cpu_percent(interval=1)
+        _ = psutil.cpu_percent(interval=1)  # unused
 
         # Fazer várias requisições
         for i in range(5):
-            with patch(
-                "app.services.ai.ai_provider.classify"
-            ) as mock_classify, patch(
+            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
                 "app.services.ai.ai_provider.generate_reply"
             ) as mock_reply:
 
@@ -339,7 +319,7 @@ class TestResourceUsage:
                 }
                 mock_reply.return_value = "Resposta"
 
-                response = client.post(
+                _ = client.post(  # unused
                     "/classify",
                     data={"text": f"Teste CPU {i}" * 100, "tone": "neutro"},
                 )

@@ -2,10 +2,6 @@
 Tests for PDF and TXT utility functions to improve coverage.
 """
 
-import io
-
-import pytest
-
 from app.utils.pdf import extract_text_from_pdf, validate_pdf
 from app.utils.txt import extract_text_from_txt, validate_txt
 
@@ -139,8 +135,6 @@ class TestFileProcessingEdgeCases:
 
     def test_extract_text_with_special_characters(self):
         """Test extraction with special Unicode characters."""
-        special_content = "🚀 Test with emojis 🎉 and symbols ∑∆".encode(
-            "utf-8"
-        )
+        special_content = "🚀 Test with emojis 🎉 and symbols ∑∆".encode("utf-8")
         result = extract_text_from_txt(special_content)
         assert result == "🚀 Test with emojis 🎉 and symbols ∑∆"

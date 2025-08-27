@@ -8,14 +8,9 @@ import pytest
 from fastapi.testclient import TestClient
 from jose import jwt
 
-from app.core.auth import (
-    authenticate_user,
-    create_access_token,
-    generate_api_key,
-    hash_api_key,
-    rate_limiter,
-    verify_token,
-)
+from app.core.auth import (authenticate_user, create_access_token,
+                           generate_api_key, hash_api_key, rate_limiter,
+                           verify_token)
 from app.core.config import settings
 from main import app
 
@@ -161,9 +156,7 @@ class TestAuthenticationEndpoints:
         token = login_response.json()["access_token"]
 
         # Use token to access protected endpoint
-        response = client.get(
-            "/auth/me", headers={"Authorization": f"Bearer {token}"}
-        )
+        response = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
 
         assert response.status_code == 200
         data = response.json()
@@ -210,9 +203,7 @@ class TestProtectedEndpoints:
 
     def test_classify_text_without_token(self):
         """Test text classification without token."""
-        response = client.post(
-            "/api/classify/text", json={"text": "Test text"}
-        )
+        response = client.post("/api/classify/text", json={"text": "Test text"})
 
         # FastAPI Security returns 403 when no token provided
         assert response.status_code == 403

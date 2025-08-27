@@ -210,8 +210,7 @@ class PromptOptimizer:
             ),
             text.count("?") > 1,  # Múltiplas perguntas
             any(
-                word in text.lower()
-                for word in ["urgente", "crítico", "imediato"]
+                word in text.lower() for word in ["urgente", "crítico", "imediato"]
             ),  # Urgência
         ]
 
@@ -231,15 +230,11 @@ class PromptOptimizer:
 
 Responda em JSON: {{"category":"Produtivo|Improdutivo","rationale":"motivo"}}"""
 
-    def get_optimized_reply_prompt(
-        self, text: str, category: str, tone: str
-    ) -> str:
+    def get_optimized_reply_prompt(self, text: str, category: str, tone: str) -> str:
         """
         Retorna prompt otimizado para geração de resposta
         """
-        return self.templates.get_reply_generation_prompt_enhanced(
-            text, category, tone
-        )
+        return self.templates.get_reply_generation_prompt_enhanced(text, category, tone)
 
     def analyze_response_quality(
         self, original_text: str, response: str, category: str
@@ -250,8 +245,7 @@ Responda em JSON: {{"category":"Produtivo|Improdutivo","rationale":"motivo"}}"""
         quality_metrics = {
             "length_appropriate": 50 <= len(response) <= 300,
             "addresses_request": any(
-                word in response.lower()
-                for word in original_text.lower().split()[:10]
+                word in response.lower() for word in original_text.lower().split()[:10]
             ),
             "has_next_steps": "será" in response
             or "prazo" in response

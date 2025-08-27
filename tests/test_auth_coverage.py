@@ -48,30 +48,28 @@ class TestAuthenticationEdgeCases:
         """Test rate limiter initialization."""
         # Test that rate_limiter is properly initialized
         assert rate_limiter is not None
-        assert hasattr(
-            rate_limiter, "requests"
-        )  # Not 'users', it's 'requests'
+        assert hasattr(rate_limiter, "requests")  # Not 'users', it's 'requests'
         assert hasattr(rate_limiter, "is_allowed")
         assert callable(rate_limiter.is_allowed)
 
     def test_login_with_invalid_form_data(self):
         """Test login endpoint with invalid form data."""
         # Missing username
-        response = client.post("/auth/token", data={"password": "admin123"})
+        _ = client.post("/auth/token", data={"password": "admin123"})  # unused
         assert response.status_code == 422  # Validation error
 
         # Missing password
-        response = client.post("/auth/token", data={"username": "admin"})
+        _ = client.post("/auth/token", data={"username": "admin"})  # unused
         assert response.status_code == 422  # Validation error
 
         # Empty form data
-        response = client.post("/auth/token", data={})
+        _ = client.post("/auth/token", data={})  # unused
         assert response.status_code == 422  # Validation error
 
     def test_login_with_malformed_data(self):
         """Test login endpoint with malformed data."""
         # Send JSON instead of form data
-        response = client.post(
+        _ = client.post(  # unused
             "/auth/token", json={"username": "admin", "password": "admin123"}
         )
         assert response.status_code == 422  # Should expect form data
@@ -79,22 +77,20 @@ class TestAuthenticationEdgeCases:
     def test_protected_endpoint_with_malformed_token(self):
         """Test protected endpoint with malformed JWT token."""
         # Invalid token format
-        response = client.get(
+        _ = client.get(  # unused
             "/auth/me",
             headers={"Authorization": "Bearer invalid.token.format"},
         )
         assert response.status_code in [401, 403]
 
         # Token with wrong parts
-        response = client.get(
+        _ = client.get(
             "/auth/me", headers={"Authorization": "Bearer not.a.jwt"}
-        )
+        )  # unused
         assert response.status_code in [401, 403]
 
         # Completely invalid authorization header
-        response = client.get(
-            "/auth/me", headers={"Authorization": "InvalidFormat"}
-        )
+        _ = client.get("/auth/me", headers={"Authorization": "InvalidFormat"})  # unused
         assert response.status_code == 403
 
     def test_classification_with_oversized_text(self):
@@ -109,7 +105,7 @@ class TestAuthenticationEdgeCases:
         # The error showed limit is 5000 chars
         oversized_text = "A" * 6000  # More than 5000
 
-        response = client.post(
+        _ = client.post(  # unused
             "/api/classify/text",
             json={"text": oversized_text},
             headers={"Authorization": f"Bearer {token}"},
@@ -129,7 +125,7 @@ class TestAuthenticationEdgeCases:
         token = login_response.json()["access_token"]
 
         # Try to upload invalid file type
-        response = client.post(
+        _ = client.post(  # unused
             "/api/classify/file",
             files={
                 "file": (
@@ -152,10 +148,10 @@ class TestAuthenticationEdgeCases:
         from app.core.auth import User, require_scopes
 
         # Create user with no scopes
-        user_no_scopes = User(username="test", scopes=[])
+        _ = User(username="test", scopes=[])  # unused
 
         # Test scope requirement
-        scope_validator = require_scopes("classify:read")
+        _ = require_scopes("classify:read")  # unused
 
         # This will be tested through the API endpoints
         # since the scope validator is a dependency
@@ -176,7 +172,7 @@ class TestAuthenticationEdgeCases:
 
         # Make several requests quickly
         for _ in range(10):
-            response = client.post(
+            _ = client.post(  # unused
                 "/api/classify/text",
                 json={"text": "Test text for rate limiting"},
                 headers=headers,
@@ -215,7 +211,9 @@ class TestAuthErrorHandling:
         from app.core.auth import verify_token
 
         # Create a token with invalid signature
-        invalid_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.invalid_signature"
+        invalid_token = (
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.invalid_signature"
+        )
 
         result = verify_token(invalid_token)
         assert result is None

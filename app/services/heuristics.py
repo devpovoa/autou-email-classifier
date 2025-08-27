@@ -99,9 +99,7 @@ def classify_heuristic(text: str) -> Tuple[str, float, str]:
     high_score = sum(3 for term in high_weight_terms if term in text_lower)
     medium_score = sum(2 for term in medium_weight_terms if term in text_lower)
     low_score = sum(1 for term in low_weight_terms if term in text_lower)
-    improdutive_score = sum(
-        2 for term in improdutive_terms if term in text_lower
-    )
+    improdutive_score = sum(2 for term in improdutive_terms if term in text_lower)
 
     productive_score = high_score + medium_score + low_score
 
@@ -112,12 +110,16 @@ def classify_heuristic(text: str) -> Tuple[str, float, str]:
     # Decision logic
     if improdutive_score > productive_score:
         confidence = min(0.5 + (improdutive_score * 0.1), 0.85)
-        rationale = f"Contém {improdutive_score} termos indicativos de mensagem não-produtiva"
+        rationale = (
+            f"Contém {improdutive_score} termos indicativos de mensagem não-produtiva"
+        )
         return "Improdutivo", confidence, rationale
 
     elif productive_score >= 3:
         confidence = min(0.6 + (productive_score * 0.05), 0.85)
-        rationale = f"Contém {productive_score} termos indicativos de necessidade de ação"
+        rationale = (
+            f"Contém {productive_score} termos indicativos de necessidade de ação"
+        )
         return "Produtivo", confidence, rationale
 
     elif productive_score >= 1:

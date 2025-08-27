@@ -1,5 +1,3 @@
-import pytest
-import pytest_asyncio
 from fastapi.testclient import TestClient
 
 from main import app
@@ -34,9 +32,7 @@ def test_classify_empty_text():
 def test_classify_too_long_text():
     """Test classification with text exceeding limit"""
     long_text = "a" * 6000  # Exceeds 5000 char limit
-    response = client.post(
-        "/classify", data={"text": long_text, "tone": "neutro"}
-    )
+    response = client.post("/classify", data={"text": long_text, "tone": "neutro"})
     assert response.status_code == 400
     error = response.json()
     assert "limite" in error["detail"].lower()

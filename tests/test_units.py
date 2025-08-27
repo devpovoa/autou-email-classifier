@@ -3,25 +3,15 @@ Testes unitários abrangentes para o sistema AutoU - Classificador de E-mails
 Testa componentes individuais: NLP, AI, utils, heuristics
 """
 
-import asyncio
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
-
 from app.services.ai import AIProvider
-from app.services.heuristics import (
-    classify_heuristic,
-    get_classification_confidence,
-)
-
+from app.services.heuristics import (classify_heuristic,
+                                     get_classification_confidence)
 # Import das classes a serem testadas
-from app.services.nlp import (
-    clean_text,
-    detect_language,
-    extract_keywords,
-    preprocess_text,
-)
+from app.services.nlp import (clean_text, detect_language, extract_keywords,
+                              preprocess_text)
 from app.utils.pdf import extract_text_from_pdf, validate_pdf
 from app.utils.txt import extract_text_from_txt, validate_txt
 
@@ -71,9 +61,7 @@ Assinatura"""
 
     def test_extract_keywords_productive_terms(self):
         """Testa extração de palavras-chave produtivas"""
-        productive_text = (
-            "Preciso de suporte para resolver erro urgente no sistema"
-        )
+        productive_text = "Preciso de suporte para resolver erro urgente no sistema"
         keywords = extract_keywords(productive_text)
 
         expected_keywords = ["suporte", "erro", "urgente", "sistema"]
@@ -87,7 +75,9 @@ Assinatura"""
 
     def test_detect_language_portuguese(self):
         """Testa detecção de idioma português"""
-        pt_text = "Este texto contém palavras que não são comuns para detectar português"
+        pt_text = (
+            "Este texto contém palavras que não são comuns para detectar português"
+        )
         assert detect_language(pt_text) == "pt"
 
     def test_detect_language_unknown(self):
@@ -136,12 +126,8 @@ class TestHeuristicsUnits:
 
     def test_get_classification_confidence_with_keywords(self):
         """Testa cálculo de confiança com palavras-chave"""
-        text_with_keywords = (
-            "Preciso de suporte para resolver problema no sistema"
-        )
-        confidence = get_classification_confidence(
-            "Produtivo", text_with_keywords
-        )
+        text_with_keywords = "Preciso de suporte para resolver problema no sistema"
+        confidence = get_classification_confidence("Produtivo", text_with_keywords)
 
         assert 0.5 <= confidence <= 0.9
         assert confidence > 0.5  # Deve ser maior que base devido às keywords
@@ -162,9 +148,9 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_openai_success(self):
         """Testa classificação OpenAI com sucesso"""
-        with patch(
-            "app.services.ai.settings.openai_api_key", "test_key"
-        ), patch("httpx.AsyncClient") as mock_client:
+        with patch("app.services.ai.settings.openai_api_key", "test_key"), patch(
+            "httpx.AsyncClient"
+        ) as mock_client:
             # Mock da resposta da API
             mock_response = Mock()
             mock_response.status_code = 200
@@ -183,7 +169,7 @@ class TestAIProviderUnits:
                 mock_response
             )
 
-            ai_provider = AIProvider()
+            _ = AIProvider()  # unused
             result = await ai_provider._classify_openai("Preciso de ajuda")
 
             assert result["category"] == "Produtivo"
@@ -202,7 +188,7 @@ class TestAIProviderUnits:
                 mock_response
             )
 
-            ai_provider = AIProvider()
+            _ = AIProvider()  # unused
 
             # Deve usar fallback heurístico
             result = await ai_provider.classify("Preciso de suporte técnico")
@@ -212,22 +198,20 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_invalid_json_response(self):
         """Testa resposta JSON inválida da OpenAI"""
-        with patch(
-            "app.services.ai.settings.openai_api_key", "test_key"
-        ), patch("httpx.AsyncClient") as mock_client:
+        with patch("app.services.ai.settings.openai_api_key", "test_key"), patch(
+            "httpx.AsyncClient"
+        ) as mock_client:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
-                "choices": [
-                    {"message": {"content": "Resposta inválida não JSON"}}
-                ]
+                "choices": [{"message": {"content": "Resposta inválida não JSON"}}]
             }
 
             mock_client.return_value.__aenter__.return_value.post.return_value = (
                 mock_response
             )
 
-            ai_provider = AIProvider()
+            _ = AIProvider()  # unused
             result = await ai_provider._classify_openai("Teste")
 
             # Deve retornar resposta padrão para JSON inválido
@@ -243,11 +227,7 @@ class TestAIProviderUnits:
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "choices": [
-                    {
-                        "message": {
-                            "content": "Prezado(a), recebemos sua solicitação..."
-                        }
-                    }
+                    {"message": {"content": "Prezado(a), recebemos sua solicitação..."}}
                 ]
             }
 
@@ -255,7 +235,7 @@ class TestAIProviderUnits:
                 mock_response
             )
 
-            ai_provider = AIProvider()
+            _ = AIProvider()  # unused
             reply = await ai_provider._generate_reply_openai(
                 "Preciso de ajuda", "Produtivo", "formal"
             )
@@ -265,7 +245,7 @@ class TestAIProviderUnits:
 
     def test_generate_reply_fallback_productive_formal(self):
         """Testa resposta fallback para email produtivo formal"""
-        ai_provider = AIProvider()
+        _ = AIProvider()  # unused
         reply = ai_provider._generate_reply_fallback("Produtivo", "formal")
 
         assert "Prezado" in reply
@@ -274,7 +254,7 @@ class TestAIProviderUnits:
 
     def test_generate_reply_fallback_improdutive_amigavel(self):
         """Testa resposta fallback para email improdutivo amigável"""
-        ai_provider = AIProvider()
+        _ = AIProvider()  # unused
         reply = ai_provider._generate_reply_fallback("Improdutivo", "amigavel")
 
         assert "😊" in reply
@@ -282,7 +262,7 @@ class TestAIProviderUnits:
 
     def test_estimate_cost_calculation(self):
         """Testa cálculo de custo da API"""
-        ai_provider = AIProvider()
+        _ = AIProvider()  # unused
         usage = {"prompt_tokens": 100, "completion_tokens": 50}
 
         cost = ai_provider._estimate_cost(usage)
@@ -407,7 +387,7 @@ class TestPromptTemplatesUnits:
 
     def test_classification_prompt_structure(self):
         """Testa estrutura do prompt de classificação"""
-        ai_provider = AIProvider()
+        _ = AIProvider()  # unused
 
         # Simular o prompt (extrair da implementação)
         text = "Teste de email"

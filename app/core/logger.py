@@ -34,9 +34,7 @@ class StructuredLogger:
             "message": message,
             **kwargs,
         }
-        self.logger.log(
-            getattr(logging, level), json.dumps(log_entry, default=str)
-        )
+        self.logger.log(getattr(logging, level), json.dumps(log_entry, default=str))
 
 
 def get_logger(name: str) -> StructuredLogger:

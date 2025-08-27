@@ -37,12 +37,8 @@ class Settings(BaseSettings):
     use_heuristic_fallback: bool = True
     confidence_threshold: float = 0.7
     heuristic_keywords_urgent: str = "urgente,emergencia,asap,critico,imediato"
-    heuristic_keywords_thanks: str = (
-        "obrigado,agradeco,thanks,grateful,appreciate"
-    )
-    heuristic_keywords_normal: str = (
-        "informacao,consulta,duvida,question,inquiry"
-    )
+    heuristic_keywords_thanks: str = "obrigado,agradeco,thanks,grateful,appreciate"
+    heuristic_keywords_normal: str = "informacao,consulta,duvida,question,inquiry"
 
     # Development specific
     reload: bool = False

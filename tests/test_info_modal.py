@@ -2,7 +2,6 @@
 Tests for the info modal functionality in the web interface.
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 from main import app

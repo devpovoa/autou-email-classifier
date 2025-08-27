@@ -66,9 +66,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
 
     # Create access token with user scopes
-    access_token_expires = timedelta(
-        minutes=settings.jwt_access_token_expire_minutes
-    )
+    access_token_expires = timedelta(minutes=settings.jwt_access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": user.username, "scopes": user.scopes},
         expires_delta=access_token_expires,
@@ -125,9 +123,7 @@ async def classify_text_api(
         return result
 
     except Exception as e:
-        logger.error(
-            f"Classification error for user {current_user.username}: {e}"
-        )
+        logger.error(f"Classification error for user {current_user.username}: {e}")
         raise HTTPException(status_code=500, detail="Classification failed")
 
 
@@ -163,12 +159,8 @@ async def classify_file_api(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"File classification error for user {current_user.username}: {e}"
-        )
-        raise HTTPException(
-            status_code=500, detail="File classification failed"
-        )
+        logger.error(f"File classification error for user {current_user.username}: {e}")
+        raise HTTPException(status_code=500, detail="File classification failed")
 
 
 # Alternative API key authentication (for legacy systems)
@@ -221,9 +213,7 @@ async def classify_email(
 
         # Validate input
         if not email_text or len(email_text.strip()) < 5:
-            raise HTTPException(
-                status_code=400, detail="Texto muito curto ou vazio"
-            )
+            raise HTTPException(status_code=400, detail="Texto muito curto ou vazio")
 
         if len(email_text) > settings.max_input_chars:
             raise HTTPException(
@@ -273,9 +263,7 @@ async def classify_email(
         raise
     except Exception as e:
         latency_ms = max(1, round((time.time() - start_time) * 1000))
-        logger.error(
-            "Classification failed", error=str(e), latency_ms=latency_ms
-        )
+        logger.error("Classification failed", error=str(e), latency_ms=latency_ms)
         raise HTTPException(status_code=500, detail="Erro interno do servidor")
 
 
@@ -291,9 +279,7 @@ async def refine_reply(request: RefineRequest):
             )
 
         # Refine the reply
-        refined_reply = await ai_provider.refine_reply(
-            request.text, request.tone
-        )
+        refined_reply = await ai_provider.refine_reply(request.text, request.tone)
 
         latency_ms = round((time.time() - start_time) * 1000)
 
@@ -305,23 +291,17 @@ async def refine_reply(request: RefineRequest):
             latency_ms=latency_ms,
         )
 
-        return JSONResponse(
-            content={"reply": refined_reply, "latency_ms": latency_ms}
-        )
+        return JSONResponse(content={"reply": refined_reply, "latency_ms": latency_ms})
 
     except HTTPException:
         raise
     except Exception as e:
         latency_ms = round((time.time() - start_time) * 1000)
-        logger.error(
-            "Reply refinement failed", error=str(e), latency_ms=latency_ms
-        )
+        logger.error("Reply refinement failed", error=str(e), latency_ms=latency_ms)
         raise HTTPException(status_code=500, detail="Erro ao refinar resposta")
 
 
-async def _extract_text(
-    form_text: Optional[str], file: Optional[UploadFile]
-) -> str:
+async def _extract_text(form_text: Optional[str], file: Optional[UploadFile]) -> str:
     """Extract text from form input or uploaded file"""
 
     if form_text and form_text.strip():
@@ -341,9 +321,7 @@ async def _extract_text(
 
         if filename_lower.endswith(".pdf"):
             if not validate_pdf(file_content):
-                raise HTTPException(
-                    status_code=400, detail="Arquivo PDF inválido"
-                )
+                raise HTTPException(status_code=400, detail="Arquivo PDF inválido")
 
             text = extract_text_from_pdf(file_content)
             if not text:
@@ -355,9 +333,7 @@ async def _extract_text(
 
         elif filename_lower.endswith((".txt", ".text")):
             if not validate_txt(file_content):
-                raise HTTPException(
-                    status_code=400, detail="Arquivo TXT inválido"
-                )
+                raise HTTPException(status_code=400, detail="Arquivo TXT inválido")
 
             text = extract_text_from_txt(file_content)
             if not text:
@@ -373,6 +349,4 @@ async def _extract_text(
                 detail="Tipo de arquivo não suportado (apenas .txt e .pdf)",
             )
 
-    raise HTTPException(
-        status_code=400, detail="Nenhum texto ou arquivo fornecido"
-    )
+    raise HTTPException(status_code=400, detail="Nenhum texto ou arquivo fornecido")

@@ -50,9 +50,7 @@ class TestRequisitoInterfaceWeb:
         """Testa se categoria é exibida nos resultados"""
         text = "Preciso de suporte técnico urgente"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -64,9 +62,7 @@ class TestRequisitoInterfaceWeb:
             }
             mock_reply.return_value = "Recebemos sua solicitação..."
 
-            response = client.post(
-                "/classify", data={"text": text, "tone": "neutro"}
-            )
+            response = client.post("/classify", data={"text": text, "tone": "neutro"})
 
             assert response.status_code == 200
             result = response.json()
@@ -79,9 +75,7 @@ class TestRequisitoInterfaceWeb:
         """Testa se resposta automática é exibida"""
         text = "Obrigado pelo excelente atendimento!"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -93,9 +87,7 @@ class TestRequisitoInterfaceWeb:
             }
             mock_reply.return_value = "Ficamos felizes em atendê-lo!"
 
-            response = client.post(
-                "/classify", data={"text": text, "tone": "amigavel"}
-            )
+            response = client.post("/classify", data={"text": text, "tone": "amigavel"})
 
             assert response.status_code == 200
             result = response.json()
@@ -114,9 +106,7 @@ class TestRequisitoBackendPython:
         email_content = "Preciso de ajuda com problema no sistema"
         txt_bytes = email_content.encode("utf-8")
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -129,9 +119,7 @@ class TestRequisitoBackendPython:
             mock_reply.return_value = "Ajuda em andamento..."
 
             files = {"file": ("email.txt", txt_bytes, "text/plain")}
-            response = client.post(
-                "/classify", data={"tone": "neutro"}, files=files
-            )
+            response = client.post("/classify", data={"tone": "neutro"}, files=files)
 
             assert response.status_code == 200
 
@@ -144,9 +132,7 @@ class TestRequisitoBackendPython:
         fake_pdf = b"fake pdf content"
 
         files = {"file": ("email.pdf", fake_pdf, "application/pdf")}
-        response = client.post(
-            "/classify", data={"tone": "neutro"}, files=files
-        )
+        response = client.post("/classify", data={"tone": "neutro"}, files=files)
 
         # Deve retornar erro para PDF inválido, mas sem quebrar
         assert response.status_code == 400
@@ -186,13 +172,9 @@ class TestRequisitoBackendPython:
         """Testa algoritmo de classificação em Produtivo/Improdutivo"""
 
         # Teste email produtivo
-        email_produtivo = (
-            "Estou com problema no sistema e preciso de suporte urgente"
-        )
+        email_produtivo = "Estou com problema no sistema e preciso de suporte urgente"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -215,9 +197,7 @@ class TestRequisitoBackendPython:
         # Teste email improdutivo
         email_improdutivo = "Parabéns pelo excelente trabalho da equipe!"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -277,9 +257,7 @@ class TestRequisitoBackendPython:
                 mock_response
             )
 
-            response = client.post(
-                "/classify", data={"text": text, "tone": "formal"}
-            )
+            response = client.post("/classify", data={"text": text, "tone": "formal"})
 
             # Se passou pela classificação AI (mesmo mockada)
             if response.status_code == 200:
@@ -291,9 +269,7 @@ class TestRequisitoBackendPython:
         """Testa geração de resposta usando API de AI"""
         text = "Preciso redefinir minha senha de acesso"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -315,9 +291,7 @@ class TestRequisitoBackendPython:
                 "seu email cadastrado em até 30 minutos."
             )
 
-            response = client.post(
-                "/classify", data={"text": text, "tone": "formal"}
-            )
+            response = client.post("/classify", data={"text": text, "tone": "formal"})
 
             assert response.status_code == 200
             result = response.json()
@@ -375,9 +349,7 @@ class TestRequisitoIntegracaoWeb:
         file_content = b"Conteudo do arquivo de teste"
         files = {"file": ("test.txt", file_content, "text/plain")}
 
-        file_response = client.post(
-            "/classify", data={"tone": "formal"}, files=files
-        )
+        file_response = client.post("/classify", data={"tone": "formal"}, files=files)
 
         # Deve processar entrada de arquivo
         assert file_response.status_code in [200, 400, 500]
@@ -385,9 +357,7 @@ class TestRequisitoIntegracaoWeb:
     def test_exibicao_resultados_frontend(self):
         """Testa se resultados são formatados corretamente para exibição"""
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -480,9 +450,7 @@ class TestRequisitosFuncionaisEspecíficos:
 
         direct_text = "Email inserido diretamente na interface sem arquivo"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -513,9 +481,7 @@ class TestRequisitosFuncionaisEspecíficos:
         ]
 
         for text, expected_category in test_cases:
-            with patch(
-                "app.services.ai.ai_provider.classify"
-            ) as mock_classify, patch(
+            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
                 "app.services.ai.ai_provider.generate_reply"
             ) as mock_reply:
 

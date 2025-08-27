@@ -40,14 +40,10 @@ class TestUploadIntegration:
     def test_upload_txt_file_integration(self):
         """Testa upload completo de arquivo TXT"""
         # Criar arquivo TXT temporário
-        txt_content = (
-            "Preciso de suporte urgente para resolver problema no sistema"
-        )
+        txt_content = "Preciso de suporte urgente para resolver problema no sistema"
         txt_bytes = txt_content.encode("utf-8")
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -91,9 +87,7 @@ class TestUploadIntegration:
         """Testa inserção direta de texto"""
         text = "Parabéns pelo excelente trabalho realizado pela equipe!"
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -105,9 +99,7 @@ class TestUploadIntegration:
             }
             mock_reply.return_value = "Obrigado pelas palavras!"
 
-            response = client.post(
-                "/classify", data={"text": text, "tone": "amigavel"}
-            )
+            response = client.post("/classify", data={"text": text, "tone": "amigavel"})
 
             if response.status_code == 200:
                 result = response.json()
@@ -120,9 +112,7 @@ class TestFullWorkflowIntegration:
 
     @patch("app.services.ai.ai_provider.classify")
     @patch("app.services.ai.ai_provider.generate_reply")
-    def test_complete_productive_email_workflow(
-        self, mock_reply, mock_classify
-    ):
+    def test_complete_productive_email_workflow(self, mock_reply, mock_classify):
         """Testa fluxo completo para email produtivo"""
         # Setup mocks
         mock_classify.return_value = {
@@ -150,9 +140,7 @@ class TestFullWorkflowIntegration:
         Obrigado.
         """
 
-        response = client.post(
-            "/classify", data={"text": email_text, "tone": "formal"}
-        )
+        response = client.post("/classify", data={"text": email_text, "tone": "formal"})
 
         assert response.status_code == 200
         result = response.json()
@@ -169,9 +157,7 @@ class TestFullWorkflowIntegration:
 
     @patch("app.services.ai.ai_provider.classify")
     @patch("app.services.ai.ai_provider.generate_reply")
-    def test_complete_improdutive_email_workflow(
-        self, mock_reply, mock_classify
-    ):
+    def test_complete_improdutive_email_workflow(self, mock_reply, mock_classify):
         """Testa fluxo completo para email improdutivo"""
         mock_classify.return_value = {
             "category": "Improdutivo",
@@ -179,9 +165,7 @@ class TestFullWorkflowIntegration:
             "rationale": "Mensagem de agradecimento",
             "meta": {"model": "gpt-4o-mini", "cost": 0.001, "fallback": False},
         }
-        mock_reply.return_value = (
-            "Oi! 😊\n\nObrigado pelas palavras carinhosas!"
-        )
+        mock_reply.return_value = "Oi! 😊\n\nObrigado pelas palavras carinhosas!"
 
         email_text = "Muito obrigado pelo excelente atendimento!"
 
@@ -201,9 +185,7 @@ class TestFullWorkflowIntegration:
         # Email com palavras-chave produtivas
         email_text = "Preciso de suporte urgente para resolver erro no sistema"
 
-        response = client.post(
-            "/classify", data={"text": email_text, "tone": "neutro"}
-        )
+        response = client.post("/classify", data={"text": email_text, "tone": "neutro"})
 
         # Deve usar fallback heurístico e retornar 200
         assert response.status_code == 200
@@ -227,9 +209,7 @@ class TestNLPIntegration:
         Enviado do meu iPhone
         """
 
-        with patch(
-            "app.services.ai.ai_provider.classify"
-        ) as mock_classify, patch(
+        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
             "app.services.ai.ai_provider.generate_reply"
         ) as mock_reply:
 
@@ -282,9 +262,7 @@ class TestAPIIntegration:
         email_text = "Preciso verificar o status do meu pedido"
 
         for tone in ["formal", "neutro", "amigavel"]:
-            with patch(
-                "app.services.ai.ai_provider.classify"
-            ) as mock_classify, patch(
+            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
                 "app.services.ai.ai_provider.generate_reply"
             ) as mock_reply:
 
@@ -300,9 +278,7 @@ class TestAPIIntegration:
                 }
 
                 if tone == "formal":
-                    mock_reply.return_value = (
-                        "Prezado(a), analisaremos seu pedido."
-                    )
+                    mock_reply.return_value = "Prezado(a), analisaremos seu pedido."
                 elif tone == "amigavel":
                     mock_reply.return_value = (
                         "Oi! Vamos dar uma olhada no seu pedido! 😊"
@@ -333,9 +309,7 @@ class TestErrorHandlingIntegration:
         large_content = b"a" * (3 * 1024 * 1024)
         files = {"file": ("large.txt", large_content, "text/plain")}
 
-        response = client.post(
-            "/classify", data={"tone": "neutro"}, files=files
-        )
+        response = client.post("/classify", data={"tone": "neutro"}, files=files)
 
         assert response.status_code == 400
         error = response.json()
@@ -345,9 +319,7 @@ class TestErrorHandlingIntegration:
         """Testa limite de caracteres"""
         long_text = "a" * 6000  # Excede limite de 5000
 
-        response = client.post(
-            "/classify", data={"text": long_text, "tone": "neutro"}
-        )
+        response = client.post("/classify", data={"text": long_text, "tone": "neutro"})
 
         assert response.status_code == 400
         error = response.json()
@@ -355,9 +327,7 @@ class TestErrorHandlingIntegration:
 
     def test_empty_input_integration(self):
         """Testa entrada vazia"""
-        response = client.post(
-            "/classify", data={"text": "", "tone": "neutro"}
-        )
+        response = client.post("/classify", data={"text": "", "tone": "neutro"})
 
         assert response.status_code == 400
         error = response.json()
