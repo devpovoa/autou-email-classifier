@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any, Dict
 
 import httpx
@@ -9,6 +10,38 @@ from app.services.heuristics import classify_heuristic
 from app.services.prompt_templates import prompt_optimizer
 
 logger = get_logger(__name__)
+
+
+def _safe_json_loads(content: str) -> dict:
+    """
+    Safely parse JSON content from OpenAI response
+    Handles cases where response is wrapped in markdown code blocks
+    """
+    try:
+        # Remove possíveis blocos ```json ... ``` ou ```
+        content = re.sub(r"^```(?:json)?|```$", "", content.strip(), flags=re.MULTILINE)
+        return json.loads(content)
+    except json.JSONDecodeError:
+        logger.warning(
+            "Invalid JSON returned by OpenAI", extra={"raw_content": content}
+        )
+        return {"category": "Produtivo", "rationale": "Erro na resposta da IA"}
+
+
+def _validate_openai_response(data: dict) -> str:
+    """
+    Validate OpenAI API response and extract content
+    Raises exception if response is invalid
+    """
+    if "choices" not in data or not data["choices"]:
+        logger.error("OpenAI API response missing choices", extra={"data": data})
+        raise Exception(f"OpenAI API error: {data.get('error', 'unknown error')}")
+
+    content = data["choices"][0]["message"]["content"]
+    if not content:
+        raise Exception("OpenAI API returned empty content")
+
+    return content.strip()
 
 
 class AIProvider:
@@ -120,57 +153,83 @@ E-mail:
 Responda APENAS em JSON válido:
 {{"category":"Produtivo|Improdutivo","rationale":"<motivo curto objetivo>"}} """
 
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {settings.openai_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": settings.model_name,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.1,
-                    "max_tokens": 150,
-                },
-            )
-
-            if response.status_code != 200:
-                raise Exception(f"OpenAI API error: {response.status_code}")
-
-            result = response.json()
-            content = result["choices"][0]["message"]["content"].strip()
-
-            # Parse JSON response
-            try:
-                parsed = json.loads(content)
-                confidence = 0.8  # Default confidence for AI responses
-
-                return {
-                    "category": parsed["category"],
-                    "confidence": confidence,
-                    "rationale": parsed["rationale"],
-                    "meta": {
-                        "model": settings.model_name,
-                        "cost": self._estimate_cost(result.get("usage", {})),
-                        "fallback": False,
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.openai_api_key}",
+                        "Content-Type": "application/json",
                     },
-                }
-            except json.JSONDecodeError:
-                logger.warning("Invalid JSON response from OpenAI")
-                return {
-                    "category": "Produtivo",
-                    "confidence": 0.5,
-                    "rationale": "Erro na resposta da IA",
-                    "meta": {
+                    json={
                         "model": settings.model_name,
-                        "cost": 0.0,
-                        "fallback": False,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.1,
+                        "max_tokens": 150,
                     },
-                }
+                )
+
+                if response.status_code != 200:
+                    error_data = response.json() if response.content else {}
+                    error_msg = error_data.get("error", {}).get(
+                        "message", "Unknown error"
+                    )
+                    logger.error(
+                        "OpenAI API error",
+                        extra={
+                            "status_code": response.status_code,
+                            "error": error_msg,
+                            "response": error_data,
+                        },
+                    )
+                    raise Exception(
+                        f"OpenAI API error ({response.status_code}): {error_msg}"
+                    )
+
+                data = response.json()
+                content = _validate_openai_response(data)
+
+                # Parse JSON response
+                try:
+                    parsed = _safe_json_loads(content)
+                    confidence = 0.8  # Default confidence for AI responses
+
+                    return {
+                        "category": parsed["category"],
+                        "confidence": confidence,
+                        "rationale": parsed["rationale"],
+                        "meta": {
+                            "model": settings.model_name,
+                            "cost": self._estimate_cost(data.get("usage", {})),
+                            "fallback": False,
+                        },
+                    }
+                except Exception as json_error:
+                    logger.warning(
+                        "Failed to parse OpenAI JSON response",
+                        extra={"raw_content": content, "error": str(json_error)},
+                    )
+                    return {
+                        "category": "Produtivo",
+                        "confidence": 0.5,
+                        "rationale": "Erro na resposta da IA",
+                        "meta": {
+                            "model": settings.model_name,
+                            "cost": 0.0,
+                            "fallback": True,
+                        },
+                    }
+
+        except Exception:
+            logger.error("OpenAI classification error", exc_info=True)
+            raise
 
     async def _generate_reply_openai(self, text: str, category: str, tone: str) -> str:
         """Generate reply using OpenAI"""
+        # Validate API key is configured
+        if not settings.openai_api_key:
+            raise ValueError("OpenAI API key not configured")
+
         tone_map = {
             "formal": "formal",
             "neutro": "neutro",
@@ -191,51 +250,98 @@ faltantes (ex: nº do chamado/protocolo), dar prazo estimado.
 E-mail recebido:
 \"\"\"{text}\"\"\""""
 
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {settings.openai_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": settings.model_name,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.3,
-                    "max_tokens": 300,
-                },
-            )
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.openai_api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": settings.model_name,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.3,
+                        "max_tokens": 300,
+                    },
+                )
 
-            if response.status_code != 200:
-                raise Exception(f"OpenAI API error: {response.status_code}")
+                if response.status_code != 200:
+                    error_data = response.json() if response.content else {}
+                    error_msg = error_data.get("error", {}).get(
+                        "message", "Unknown error"
+                    )
+                    logger.error(
+                        "OpenAI API error during reply generation",
+                        extra={
+                            "status_code": response.status_code,
+                            "error": error_msg,
+                            "response": error_data,
+                        },
+                    )
+                    raise Exception(
+                        f"OpenAI API error ({response.status_code}): {error_msg}"
+                    )
 
-            result = response.json()
-            return result["choices"][0]["message"]["content"].strip()
+                data = response.json()
+                content = _validate_openai_response(data)
+                return content
+
+        except Exception:
+            logger.error("OpenAI reply generation error", exc_info=True)
+            raise
 
     async def _refine_reply_openai(self, reply: str, tone: str) -> str:
         """Refine reply using OpenAI"""
+        # Validate API key is configured
+        if not settings.openai_api_key:
+            raise ValueError("OpenAI API key not configured")
+
         prompt = f"""Tarefa: Reescrever mantendo o mesmo sentido, ajustando o tom para {tone} e deixando mais conciso.
 Texto atual:
 \"\"\"{reply}\"\"\"
 Responda apenas com o corpo revisado."""
 
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {settings.openai_api_key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": settings.model_name,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.3,
-                    "max_tokens": 300,
-                },
-            )
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.openai_api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": settings.model_name,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.3,
+                        "max_tokens": 300,
+                    },
+                )
 
-            result = response.json()
-            return result["choices"][0]["message"]["content"].strip()
+                if response.status_code != 200:
+                    error_data = response.json() if response.content else {}
+                    error_msg = error_data.get("error", {}).get(
+                        "message", "Unknown error"
+                    )
+                    logger.error(
+                        "OpenAI API error during refinement",
+                        extra={
+                            "status_code": response.status_code,
+                            "error": error_msg,
+                            "response": error_data,
+                        },
+                    )
+                    raise Exception(
+                        f"OpenAI API error ({response.status_code}): {error_msg}"
+                    )
+
+                data = response.json()
+                content = _validate_openai_response(data)
+                return content
+
+        except Exception:
+            logger.error("OpenAI reply refinement error", exc_info=True)
+            raise
 
     async def _classify_huggingface(self, text: str) -> Dict[str, Any]:
         """HuggingFace classification - placeholder implementation"""
@@ -374,6 +480,10 @@ Responda apenas com o corpo revisado."""
         """
         OpenAI classification with custom prompt
         """
+        # Validate API key is configured
+        if not settings.openai_api_key:
+            raise ValueError("OpenAI API key not configured")
+
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
@@ -390,32 +500,60 @@ Responda apenas com o corpo revisado."""
                     },
                 )
 
+                if response.status_code != 200:
+                    error_data = response.json() if response.content else {}
+                    error_msg = error_data.get("error", {}).get(
+                        "message", "Unknown error"
+                    )
+                    logger.error(
+                        "OpenAI API error",
+                        extra={
+                            "status_code": response.status_code,
+                            "error": error_msg,
+                            "response": error_data,
+                        },
+                    )
+                    raise Exception(
+                        f"OpenAI API error ({response.status_code}): {error_msg}"
+                    )
+
                 data = response.json()
-                content = data["choices"][0]["message"]["content"].strip()
+                content = _validate_openai_response(data)
 
                 try:
-                    result = json.loads(content)
+                    result = _safe_json_loads(content)
                     result["meta"] = {
                         "model": settings.model_name,
                         "cost": self._estimate_cost(data.get("usage", {})),
                         "fallback": False,
                     }
                     return result
-                except json.JSONDecodeError:
-                    logger.warning("Invalid JSON response from OpenAI")
+                except Exception as json_error:
+                    logger.warning(
+                        "Failed to parse OpenAI JSON response",
+                        extra={"raw_content": content, "error": str(json_error)},
+                    )
                     return {
                         "category": "Produtivo",
-                        "rationale": "Erro na resposta",
+                        "rationale": "Erro na resposta da IA",
+                        "meta": {
+                            "model": settings.model_name,
+                            "fallback": True,
+                        },
                     }
 
-        except Exception as e:
-            logger.error(f"OpenAI API error: {e}")
+        except Exception:
+            logger.error("OpenAI classification error", exc_info=True)
             raise
 
     async def _generate_reply_openai_with_prompt(self, prompt: str) -> str:
         """
         Generate reply using OpenAI with custom prompt
         """
+        # Validate API key is configured
+        if not settings.openai_api_key:
+            raise ValueError("OpenAI API key not configured")
+
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
@@ -432,11 +570,29 @@ Responda apenas com o corpo revisado."""
                     },
                 )
 
-                data = response.json()
-                return data["choices"][0]["message"]["content"].strip()
+                if response.status_code != 200:
+                    error_data = response.json() if response.content else {}
+                    error_msg = error_data.get("error", {}).get(
+                        "message", "Unknown error"
+                    )
+                    logger.error(
+                        "OpenAI API error",
+                        extra={
+                            "status_code": response.status_code,
+                            "error": error_msg,
+                            "response": error_data,
+                        },
+                    )
+                    raise Exception(
+                        f"OpenAI API error ({response.status_code}): {error_msg}"
+                    )
 
-        except Exception as e:
-            logger.error(f"OpenAI reply generation error: {e}")
+                data = response.json()
+                content = _validate_openai_response(data)
+                return content
+
+        except Exception:
+            logger.error("OpenAI reply generation error", exc_info=True)
             raise
 
 
