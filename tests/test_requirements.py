@@ -155,11 +155,8 @@ class TestRequisitoBackendPython:
 
     def test_preprocessamento_nlp(self):
         """Testa técnicas de NLP (remoção de stop words, processamento)"""
-        from app.services.nlp import (
-            clean_text,
-            extract_keywords,
-            preprocess_text,
-        )
+        from app.services.nlp import (clean_text, extract_keywords,
+                                      preprocess_text)
 
         # Texto com elementos que devem ser removidos/processados
         messy_text = """

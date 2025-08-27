@@ -2,32 +2,17 @@ import time
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    Request,
-    UploadFile,
-    status,
-)
+from fastapi import (APIRouter, Depends, File, Form, HTTPException, Request,
+                     UploadFile, status)
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from app.core.auth import (
-    Token,
-    User,
-    api_key_auth,
-    authenticate_user,
-    create_access_token,
-    create_refresh_token,
-    get_current_active_user,
-    rate_limit_check,
-    require_scopes,
-)
+from app.core.auth import (Token, User, api_key_auth, authenticate_user,
+                           create_access_token, create_refresh_token,
+                           get_current_active_user, rate_limit_check,
+                           require_scopes)
 from app.core.config import settings
 from app.core.logger import get_logger
 from app.services.ai import ai_provider
