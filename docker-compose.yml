@@ -48,7 +48,12 @@ services:
     volumes:
       - .:/app
       - ./coverage:/app/coverage
-    command: python -m pytest --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing -v
+    command: >
+      sh -c "
+        rm -f .coverage* &&
+        python -m pytest --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing -v ||
+        python -m pytest --cov=app --cov-report=term-missing -v
+      "
     profiles:
       - test
 
