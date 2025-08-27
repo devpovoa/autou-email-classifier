@@ -281,9 +281,7 @@ class TestResourceUsage:
                 }
                 mock_reply.return_value = f"Resposta {i}"
 
-                response = client.post(
-                    "/classify", data={"text": text, "tone": "neutro"}
-                )
+                client.post("/classify", data={"text": text, "tone": "neutro"})
 
         # Forçar garbage collection
         gc.collect()
@@ -320,7 +318,7 @@ class TestResourceUsage:
                 }
                 mock_reply.return_value = "Resposta"
 
-                response = client.post(
+                client.post(
                     "/classify",
                     data={"text": f"Teste CPU {i}" * 100, "tone": "neutro"},
                 )

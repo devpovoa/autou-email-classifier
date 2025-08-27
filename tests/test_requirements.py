@@ -149,9 +149,9 @@ class TestRequisitoBackendPython:
         # Texto com elementos que devem ser removidos/processados
         messy_text = """
         De: user@example.com
-        
+
         Olá!!! Preciso de suporte para resolver um erro no sistema urgente...
-        
+
         Muito obrigado pela atenção.
         --
         Assinatura

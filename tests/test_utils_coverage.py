@@ -70,7 +70,8 @@ class TestTXTUtils:
     def test_extract_text_from_invalid_encoding(self):
         """Test text extraction with content that can't be decoded."""
         # The function actually tries multiple encodings, so this may succeed
-        # Let's create content that will fail with latin-1 but work with another encoding
+        # Let's create content that will fail with latin-1 but work with another
+        # encoding
         invalid_content = b"\xff\xfe\x00\x00\x01\x02\x03"
         result = extract_text_from_txt(invalid_content)
         # The function will try multiple encodings, so it may not be None

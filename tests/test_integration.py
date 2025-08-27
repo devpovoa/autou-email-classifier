@@ -131,14 +131,14 @@ class TestFullWorkflowIntegration:
         # Email produtivo
         email_text = """
         Assunto: Erro no sistema de login
-        
+
         Olá,
-        
+
         Estou enfrentando problemas para acessar minha conta.
         O sistema retorna erro 500 quando tento fazer login.
-        
+
         Protocolo: #12345
-        
+
         Obrigado.
         """
 
@@ -182,7 +182,8 @@ class TestFullWorkflowIntegration:
 
     def test_ai_failure_fallback_integration(self):
         """Testa o fallback quando a IA falha"""
-        # Sem mockar - deixar o sistema usar fallback naturalmente quando OpenAI não configurado
+        # Sem mockar - deixar o sistema usar fallback naturalmente quando OpenAI
+        # não configurado
 
         # Email com palavras-chave produtivas
         email_text = "Preciso de suporte urgente para resolver erro no sistema"
@@ -204,9 +205,9 @@ class TestNLPIntegration:
         messy_text = """
         De: user@example.com
         Para: support@company.com
-        
+
         Olá!!!    Preciso   de     ajuda@@@ com sistema...
-        
+
         --
         Enviado do meu iPhone
         """

@@ -22,28 +22,28 @@ DEFINIÇÕES:
 EXEMPLOS DE TREINAMENTO:
 
 Email: "Sistema está fora do ar desde ontem, preciso de ajuda urgente"
-Classificação: {{"category": "Produtivo", "rationale": "Problema técnico urgente requer suporte imediato"}}
+Classificação: {"category": "Produtivo", "rationale": "Problema técnico urgente requer suporte imediato"}
 
 Email: "Parabéns pela apresentação excelente na reunião de hoje"
-Classificação: {{"category": "Improdutivo", "rationale": "Mensagem de felicitação não requer ação"}}
+Classificação: {"category": "Improdutivo", "rationale": "Mensagem de felicitação não requer ação"}
 
 Email: "Não consigo acessar minha conta, erro 403"
-Classificação: {{"category": "Produtivo", "rationale": "Problema de acesso requer suporte técnico"}}
+Classificação: {"category": "Produtivo", "rationale": "Problema de acesso requer suporte técnico"}
 
 Email: "Obrigado pela ajuda de ontem, problema resolvido"
-Classificação: {{"category": "Improdutivo", "rationale": "Agradecimento por problema já resolvido"}}
+Classificação: {"category": "Improdutivo", "rationale": "Agradecimento por problema já resolvido"}
 
 Email: "Qual o status do chamado #12345 aberto semana passada?"
-Classificação: {{"category": "Produtivo", "rationale": "Solicitação de status de chamado requer informação"}}
+Classificação: {"category": "Produtivo", "rationale": "Solicitação de status de chamado requer informação"}
 
 Email: "Feliz aniversário! Desejo muito sucesso"
-Classificação: {{"category": "Improdutivo", "rationale": "Mensagem social não requer resposta corporativa"}}
+Classificação: {"category": "Improdutivo", "rationale": "Mensagem social não requer resposta corporativa"}
 
 AGORA CLASSIFIQUE:
 Email: \"\"\"{text}\"\"\"
 
 Responda APENAS em JSON válido seguindo o formato dos exemplos:
-{{"category":"Produtivo|Improdutivo","rationale":"<justificativa específica e objetiva>"}}"""
+{"category":"Produtivo|Improdutivo","rationale":"<justificativa específica e objetiva>"} """
 
     @staticmethod
     def get_reply_generation_prompt_enhanced(
@@ -111,7 +111,7 @@ AGORA RESPONDA AO EMAIL:
 
 INSTRUÇÕES:
 - Tom: {style_config['style']}
-- Saudação: "{style_config['greeting']}"  
+- Saudação: "{style_config['greeting']}"
 - Encerramento: "{style_config['closing']}"
 
 REGRAS PARA EMAILS IMPRODUTIVOS:
@@ -153,7 +153,7 @@ ANÁLISE REQUERIDA:
 
 DIRETRIZES POR TOM:
 - formal: linguagem protocolar, "Prezado(a)", "Atenciosamente"
-- neutro: linguagem direta, "Olá", "Cordialmente"  
+- neutro: linguagem direta, "Olá", "Cordialmente"
 - amigavel: linguagem calorosa, emojis sutis, "Oi!", "Um abraço"
 
 TEXTO ATUAL:
@@ -228,7 +228,8 @@ class PromptOptimizer:
 
 "{text}"
 
-Responda em JSON: {{"category":"Produtivo|Improdutivo","rationale":"motivo"}}"""
+Responda em JSON: {
+                "category":"Produtivo|Improdutivo","rationale":"motivo"} """
 
     def get_optimized_reply_prompt(self, text: str, category: str, tone: str) -> str:
         """

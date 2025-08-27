@@ -109,14 +109,16 @@ class AIProvider:
         prompt = f"""Tarefa: Classificar o e-mail como uma das categorias em ["Produtivo", "Improdutivo"].
 
 Definições:
-- Produtivo: requer ação/resposta objetiva (suporte, status de caso, dúvida sobre sistema, cobrança, acesso, faturamento, prazo).
-- Improdutivo: não requer ação imediata (felicitações, agradecimentos, mensagens genéricas).
+- Produtivo: requer ação/resposta objetiva (suporte, status de caso, dúvida sobre sistema,
+cobrança, acesso, faturamento, prazo).
+- Improdutivo: não requer ação imediata (felicitações, agradecimentos, mensagens
+genéricas).
 
 E-mail:
 \"\"\"{text}\"\"\"
 
 Responda APENAS em JSON válido:
-{{"category":"Produtivo|Improdutivo","rationale":"<motivo curto objetivo>"}}"""
+{"category":"Produtivo|Improdutivo","rationale":"<motivo curto objetivo>"} """
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.post(
@@ -181,7 +183,8 @@ Tom: {tone_map.get(tone, tone)}
 
 Regras:
 - 3 a 6 linhas, claras.
-- Se "Produtivo": reconhecer pedido, apontar próximo passo, solicitar dados faltantes (ex: nº do chamado/protocolo), dar prazo estimado.
+- Se "Produtivo": reconhecer pedido, apontar próximo passo, solicitar dados
+faltantes (ex: nº do chamado/protocolo), dar prazo estimado.
 - Se "Improdutivo": agradecer e encerrar com cordialidade.
 - Não inclua disclaimers sobre IA; apenas o corpo do e-mail.
 
@@ -265,15 +268,17 @@ Responda apenas com o corpo revisado."""
         if category == "Produtivo":
             if tone == "formal":
                 return (
-                    "Prezado(a),\n\nRecebemos sua solicitação e ela será analisada pela nossa equipe. "
-                    "Para melhor atendimento, favor informar o número do protocolo caso já possua. "
-                    "Retornaremos em até 24 horas úteis.\n\nAtenciosamente,\nEquipe de Suporte"
+                    "Prezado(a),\n\nRecebemos sua solicitação e ela será analisada pela "
+                    "nossa equipe. Para melhor atendimento, favor informar o número do "
+                    "protocolo caso já possua. Retornaremos em até 24 horas úteis.\n\n"
+                    "Atenciosamente,\nEquipe de Suporte"
                 )
             elif tone == "amigavel":
                 return (
-                    "Olá! 😊\n\nObrigado por entrar em contato! Sua mensagem já chegou aqui e vamos "
-                    "analisar com cuidado. Se tiver algum número de protocolo, pode compartilhar que "
-                    "vai acelerar o processo. Voltamos a falar em breve!\n\nUm abraço,\nTime de Suporte"
+                    "Olá! 😊\n\nObrigado por entrar em contato! Sua mensagem já chegou "
+                    "aqui e vamos analisar com cuidado. Se tiver algum número de "
+                    "protocolo, pode compartilhar que vai acelerar o processo. Voltamos "
+                    "a falar em breve!\n\nUm abraço,\nTime de Suporte"
                 )
             else:
                 return (
