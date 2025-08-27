@@ -1,8 +1,15 @@
 # AutoU - Classificador de E-mails
 
 [![Deploy on Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)
+![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen.svg)
+![Tests](https://img.shields.io/badge/Tests-179%20passed-success.svg)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
 
 Uma aplicação web inteligente para classificação automática de e-mails e geração de respostas, construída com **FastAPI**, **Tailwind CSS** e **Alpine.js**.
+
+> **🎯 Status**: Sistema completo com autenticação JWT, 87% cobertura de testes, containerização Docker e deploy automatizado.
 
 ## 🚀 Demo
 
@@ -10,42 +17,67 @@ Uma aplicação web inteligente para classificação automática de e-mails e ge
 
 ## ✨ Funcionalidades
 
-- **Classificação Inteligente**: Classifica e-mails como "Produtivo" ou "Improdutivo" usando IA + fallback heurístico
-- **Geração de Respostas**: Cria respostas automáticas contextualizadas com diferentes tons (formal/neutro/amigável)
-- **Upload de Arquivos**: Suporte para arquivos TXT e PDF (até 2MB)
-- **Interface Premium**: Design moderno com Tailwind CSS, modo escuro e microinterações
-- **Histórico Local**: Armazena os últimos 5 classificações no navegador
-- **Métricas em Tempo Real**: Exibe latência, modelo utilizado e confiança
-- **Acessibilidade**: Suporte completo a teclado e leitores de tela
+- **🧠 Classificação Inteligente**: Classifica e-mails como "Produtivo" ou "Improdutivo" usando IA + fallback heurístico
+- **✍️ Geração de Respostas**: Cria respostas automáticas contextualizadas com diferentes tons (formal/neutro/amigável)
+- **📁 Upload de Arquivos**: Suporte para arquivos TXT e PDF (até 2MB)
+- **🎨 Interface Premium**: Design moderno com Tailwind CSS, modo escuro e microinterações
+- **📊 Histórico Local**: Armazena os últimos 5 classificações no navegador
+- **⚡ Métricas em Tempo Real**: Exibe latência, modelo utilizado e confiança
+- **♿ Acessibilidade**: Suporte completo a teclado e leitores de tela
+- **🔐 Segurança JWT**: Sistema completo de autenticação e autorização
+- **🐳 Docker Ready**: Containerização completa para produção
+
+## 📚 Documentação Complementar
+
+### 📋 Guias Essenciais
+- 🐳 **[Setup Docker](README_DOCKER.md)** - Instruções completas de containerização e deploy
+- 🔒 **[Guia de Segurança](API_SECURITY_GUIDE.md)** - Implementação JWT e boas práticas de API
+- 🧪 **[Documentação de Testes](TESTS_README.md)** - Guia completo de testes e cobertura
+- 🤝 **[Como Contribuir](CONTRIBUTING.md)** - Guia para desenvolvedores e colaboradores
+
+### 📖 Documentação Técnica
+- 🚀 **[Melhorias da IA](AI_IMPROVEMENTS.md)** - Otimizações e engenharia de prompts
+- 🔑 **[Implementação JWT](JWT_IMPLEMENTATION_SUMMARY.md)** - Resumo da autenticação
+- 🐋 **[Docker Setup](DOCKER_SETUP.md)** - Configuração detalhada de containers
+- 📋 **[Changelog](CHANGELOG.md)** - Histórico de versões e mudanças
+- ✅ **[Validação Final](FINAL_VALIDATION.md)** - Relatório de testes e validação
 
 ## 🏗️ Arquitetura
 
 ### Stack Tecnológica
-- **Backend**: FastAPI (Python 3.12) com Uvicorn
+- **Backend**: FastAPI (Python 3.12) com Uvicorn ASGI
 - **Frontend**: Jinja2 + TailwindCSS + Alpine.js
+- **Autenticação**: JWT com python-jose e passlib
 - **IA**: OpenAI GPT-4o-mini (configurável para HuggingFace)
-- **Processamento**: spaCy + NLTK para NLP
+- **Processamento**: spaCy + NLTK para análise de linguagem natural
 - **Arquivos**: pypdf para extração de texto de PDFs
-- **Deploy**: Render.com com Docker
+- **Deploy**: Render.com com Docker multi-stage
+- **Testes**: pytest com 87% de cobertura
 
 ### Estrutura do Projeto
 ```
 app/
-├── core/           # Configurações e logging
-├── services/       # Lógica de negócio (IA, NLP, heurísticas)
-├── utils/          # Utilitários para PDF/TXT
-├── web/           # Rotas e templates
-│   └── templates/  # Templates Jinja2
-tests/             # Testes automatizados
-main.py           # Ponto de entrada da aplicação
+├── core/           # 🔧 Configurações, auth JWT e logging
+├── services/       # 🧠 Lógica de negócio (IA, NLP, heurísticas)
+├── utils/          # 🛠️ Utilitários para PDF/TXT
+├── web/           # 🌐 Rotas FastAPI e templates
+│   └── templates/  # 📄 Templates Jinja2 com Alpine.js
+tests/             # 🧪 Suite de testes (87% cobertura)
+scripts/           # 📜 Scripts de automação e deploy
+main.py           # 🚀 Ponto de entrada da aplicação
 ```
+
+> **📊 Métricas do Projeto**: 179 testes | 87% cobertura | Docker ready | JWT implementado
 
 ## 🛠️ Setup Local
 
+> **🚀 Quick Start**: Para setup com Docker, veja o **[README_DOCKER.md](README_DOCKER.md)** com instruções automatizadas.
+
 ### Pré-requisitos
 - Python 3.12+
-- pip
-- Conta OpenAI (opcional, usa fallback heurístico)
+- pip ou poetry
+- Conta OpenAI (opcional - sistema funciona com fallback heurístico)
+- Git
 
 ### Instalação
 
@@ -75,12 +107,24 @@ cp .env.example .env
 
 Edite o arquivo `.env` com suas credenciais:
 ```env
+# API Configuration
 PROVIDER=OpenAI
 OPENAI_API_KEY=sk-your-key-here
 MODEL_NAME=gpt-4o-mini
+
+# Server Configuration
 PORT=8000
 LOG_LEVEL=INFO
 MAX_INPUT_CHARS=5000
+MAX_FILE_SIZE=2097152
+
+# JWT Configuration (gerado automaticamente se não definido)
+JWT_SECRET_KEY=your-super-secret-key
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Default API Authentication
+DEFAULT_API_KEY=your-api-key-here
 ```
 
 5. **Execute a aplicação**
@@ -90,26 +134,44 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 A aplicação estará disponível em: http://localhost:8000
 
+> **🔐 Autenticação**: Use `admin`/`admin123` para login ou configure suas próprias credenciais.
+
 ## 🧪 Executar Testes
+
+> **📖 Documentação Completa**: Veja **[TESTS_README.md](TESTS_README.md)** para guia detalhado de testes.
 
 ```bash
 # Instalar dependências de teste
-pip install pytest pytest-asyncio
+pip install pytest pytest-asyncio pytest-cov
 
 # Executar todos os testes
 python -m pytest tests/ -v
 
 # Executar testes com cobertura
-python -m pytest tests/ --cov=app --cov-report=html
+python -m pytest tests/ --cov=app --cov-report=html --cov-report=term-missing
+
+# Executar testes específicos
+python -m pytest tests/test_auth.py -v    # Testes JWT
+python -m pytest tests/test_routes.py -v  # Testes de rotas
 ```
 
+### 📊 Cobertura Atual: 87%
+- **179 testes** executados com sucesso
+- **Auth/JWT**: 92% de cobertura  
+- **Services**: 85-97% de cobertura
+- **Routes**: 79% de cobertura
+
 ### Estrutura dos Testes
-- `test_nlp.py`: Testa preprocessamento e extração de keywords
-- `test_heuristics.py`: Testa classificação heurística
-- `test_utils.py`: Testa extração de texto de arquivos
-- `test_routes.py`: Testa endpoints da API
+- `test_auth.py`: Sistema JWT e autenticação
+- `test_routes.py`: Endpoints da API web
+- `test_integration.py`: Testes de fluxo completo
+- `test_nlp.py`: Processamento de linguagem natural
+- `test_heuristics.py`: Sistema de classificação heurística
+- `test_utils.py`: Utilitários de arquivos PDF/TXT
 
 ## 🚀 Deploy no Render
+
+> **🐳 Deploy com Docker**: Para instruções completas de containerização, veja **[README_DOCKER.md](README_DOCKER.md)**.
 
 ### Deploy Automático (Recomendado)
 
@@ -124,6 +186,8 @@ python -m pytest tests/ --cov=app --cov-report=html
    - Nome: `autou-classificador`
    - Runtime: `Docker`
    - Branch: `main`
+   - Build Command: `docker build -t app .`
+   - Start Command: `docker run -p $PORT:$PORT app`
 
 4. **Adicione variáveis de ambiente**
    ```
@@ -131,32 +195,45 @@ python -m pytest tests/ --cov=app --cov-report=html
    OPENAI_API_KEY=sk-your-key-here
    MODEL_NAME=gpt-4o-mini
    PORT=8000
+   JWT_SECRET_KEY=your-production-secret
+   DEFAULT_API_KEY=your-production-api-key
    ```
 
 5. **Deploy**: O Render fará o build e deploy automaticamente
 
+> **⚠️ Importante**: Configure todas as variáveis de ambiente obrigatórias antes do deploy.
+
 ### Deploy Manual
 
-1. **Instale o Render CLI**
 ```bash
+# Instale o Render CLI
 npm install -g @render/cli
-```
 
-2. **Faça login**
-```bash
+# Faça login
 render auth login
-```
 
-3. **Deploy**
-```bash
+# Deploy
 render deploy
 ```
 
 ## 📊 Uso da API
 
+> **🔒 Guia de Segurança**: Para detalhes sobre autenticação JWT e segurança da API, veja **[API_SECURITY_GUIDE.md](API_SECURITY_GUIDE.md)**.
+
+### Autenticação
+
+A API possui endpoints públicos e protegidos:
+
+```bash
+# Login para obter token JWT
+curl -X POST "http://localhost:8000/auth/login" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin&password=admin123"
+```
+
 ### Endpoints Principais
 
-#### `POST /classify`
+#### `POST /classify` (Público)
 Classifica e-mail e gera resposta
 ```bash
 curl -X POST "http://localhost:8000/classify" \
@@ -164,7 +241,16 @@ curl -X POST "http://localhost:8000/classify" \
   -F "tone=neutro"
 ```
 
-#### `POST /refine`
+#### `POST /api/classify` (Protegido)
+API endpoint com autenticação
+```bash
+curl -X POST "http://localhost:8000/api/classify" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Preciso de ajuda urgente", "tone":"formal"}'
+```
+
+#### `POST /refine` (Público)
 Refina resposta existente
 ```bash
 curl -X POST "http://localhost:8000/refine" \
@@ -172,11 +258,16 @@ curl -X POST "http://localhost:8000/refine" \
   -d '{"text":"Resposta atual", "tone":"formal"}'
 ```
 
-#### `GET /health`
-Verificação de saúde
+#### `GET /health` (Público)
+Verificação de saúde do sistema
 ```bash
 curl http://localhost:8000/health
 ```
+
+### Documentação Interativa
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
 ## 🎯 Decisões Técnicas
 
@@ -214,11 +305,16 @@ Logs em formato JSON estruturado para fácil integração com ferramentas de mon
 
 ## 🔒 Segurança
 
-- **Validação de Entrada**: Limite de caracteres e tamanho de arquivo
-- **Sanitização**: Remoção de informações sensíveis dos logs
-- **Rate Limiting**: Controle de requisições por IP (em produção)
-- **HTTPS**: Forçado em produção via Render
-- **Secrets**: Variáveis de ambiente para chaves de API
+> **🛡️ Guia Detalhado**: Para informações completas sobre segurança, veja **[API_SECURITY_GUIDE.md](API_SECURITY_GUIDE.md)**.
+
+- **🔐 Autenticação JWT**: Sistema completo com tokens seguros
+- **✅ Validação de Entrada**: Limite de caracteres e tamanho de arquivo
+- **🧹 Sanitização**: Remoção de informações sensíveis dos logs
+- **⏱️ Rate Limiting**: Controle de requisições por IP (produção)
+- **🔒 HTTPS**: Forçado em produção via Render
+- **🔑 Secrets Management**: Variáveis de ambiente para chaves de API
+- **🛡️ CORS**: Configuração adequada para produção
+- **📝 Logs Estruturados**: Auditoria completa de ações
 
 ## 🚧 Limitações Conhecidas
 
@@ -249,11 +345,26 @@ Logs em formato JSON estruturado para fácil integração com ferramentas de mon
 
 ## 🤝 Contribuição
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'feat: add amazing feature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+> **📋 Guia Completo**: Veja **[CONTRIBUTING.md](CONTRIBUTING.md)** para instruções detalhadas.
+
+### Como Contribuir
+
+1. **Fork o projeto**
+2. **Crie uma branch** para sua feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit suas mudanças** (`git commit -m 'feat: add amazing feature'`)
+4. **Push para a branch** (`git push origin feature/AmazingFeature`)
+5. **Abra um Pull Request**
+
+### Diretrizes
+- 📝 Siga os padrões de commit convencionais
+- 🧪 Mantenha a cobertura de testes acima de 85%
+- 📖 Documente novas funcionalidades
+- 🎨 Use formatação com black e isort
+- ✅ Execute todos os testes antes do PR
+
+## 📋 Changelog
+
+Veja **[CHANGELOG.md](CHANGELOG.md)** para histórico completo de versões e mudanças.
 
 ## 📄 Licença
 
