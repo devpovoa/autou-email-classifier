@@ -1,0 +1,88 @@
+services:
+  # Aplicação principal
+  app:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8000:8000"
+    environment:
+      - PROVIDER=OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LOG_LEVEL=INFO
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Serviço para desenvolvimento
+  app-dev:
+    build:
+      context: .
+      target: development
+    ports:
+      - "8001:8000"
+    environment:
+      - PROVIDER=OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LOG_LEVEL=DEBUG
+      - PORT=8000
+    volumes:
+      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  # Serviço para testes
+  test:
+    build:
+      context: .
+      target: development
+    environment:
+      - PROVIDER=OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LOG_LEVEL=ERROR
+    volumes:
+      - .:/app
+      - ./coverage:/app/coverage
+    command: python -m pytest --cov=app --cov-report=xml --cov-report=html --cov-report=term-missing -v
+    profiles:
+      - test
+
+  # Serviço para testes de performance
+  test-performance:
+    build:
+      context: .
+      target: development
+    environment:
+      - PROVIDER=OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LOG_LEVEL=ERROR
+    volumes:
+      - .:/app
+    command: python -m pytest tests/test_performance.py -v --tb=short
+    profiles:
+      - test
+
+  # Serviço para linting e formatação
+  lint:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+    command: |
+      sh -c "
+        pip install flake8 black isort &&
+        echo '=== Running Black ===' &&
+        black --check app/ tests/ main.py &&
+        echo '=== Running isort ===' &&
+        isort --check-only app/ tests/ main.py &&
+        echo '=== Running flake8 ===' &&
+        flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503
+      "
+    profiles:
+      - lint

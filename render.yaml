@@ -1,0 +1,22 @@
+version: 2
+build:
+  commands:
+    - echo "Installing system dependencies..."
+    - apt-get update && apt-get install -y curl
+    - echo "Installing Python dependencies..."
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - echo "Build completed successfully"
+start:
+  command: uvicorn main:app --host 0.0.0.0 --port $PORT
+env_vars:
+  - key: PYTHON_VERSION
+    value: 3.12
+  - key: PORT
+    value: 8000
+  - key: LOG_LEVEL
+    value: INFO
+  - key: MAX_INPUT_CHARS
+    value: 5000
+  - key: AI_TIMEOUT
+    value: 30
