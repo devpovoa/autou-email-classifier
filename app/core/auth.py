@@ -5,18 +5,15 @@ This module provides JWT token generation, validation, and API key
 authentication to secure the email classification endpoints.
 """
 
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
-import secrets
 import hashlib
 import hmac
+import secrets
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
 
-from fastapi import HTTPException, Security, status, Depends
-from fastapi.security import (
-    HTTPBearer,
-    HTTPAuthorizationCredentials,
-    APIKeyHeader
-)
+from fastapi import Depends, HTTPException, Security, status
+from fastapi.security import (APIKeyHeader, HTTPAuthorizationCredentials,
+                              HTTPBearer)
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel

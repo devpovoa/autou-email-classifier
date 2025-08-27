@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 1440  # 24 hours
     jwt_refresh_token_expire_days: int = 7  # 7 days
-    
+
     # API Security
     enable_auth: bool = True
     api_key_header: str = "X-API-Key"

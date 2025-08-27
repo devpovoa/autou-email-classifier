@@ -2,27 +2,19 @@ import time
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
-from fastapi import (
-    APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
-)
+from fastapi import (APIRouter, Depends, File, Form, HTTPException, Request,
+                     UploadFile, status)
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
+from app.core.auth import (Token, User, api_key_auth, authenticate_user,
+                           create_access_token, create_refresh_token,
+                           get_current_active_user, rate_limit_check,
+                           require_scopes)
 from app.core.config import settings
 from app.core.logger import get_logger
-from app.core.auth import (
-    authenticate_user,
-    create_access_token,
-    create_refresh_token,
-    get_current_active_user,
-    api_key_auth,
-    require_scopes,
-    rate_limit_check,
-    Token,
-    User
-)
 from app.services.ai import ai_provider
 from app.services.nlp import preprocess_text
 from app.utils.pdf import extract_text_from_pdf, validate_pdf
@@ -62,7 +54,7 @@ async def health():
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     OAuth2 compatible token login endpoint.
-    
+
     Get access token for interactive API docs.
     """
     user = authenticate_user(form_data.username, form_data.password)
@@ -72,7 +64,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Create access token with user scopes
     access_token_expires = timedelta(
         minutes=settings.jwt_access_token_expire_minutes
@@ -81,12 +73,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": user.username, "scopes": user.scopes},
         expires_delta=access_token_expires
     )
-    
+
     # Create refresh token
     refresh_token = create_refresh_token(
         data={"sub": user.username, "scopes": user.scopes}
     )
-    
+
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -110,7 +102,7 @@ async def classify_text_api(
 ):
     """
     Classify email text via API (JWT protected).
-    
+
     Requires 'classify:read' scope.
     """
     try:
@@ -119,19 +111,19 @@ async def classify_text_api(
                 status_code=400,
                 detail=f"Text exceeds limit of {settings.max_input_chars}"
             )
-        
+
         # Preprocess text
         processed_text = preprocess_text(request.text)
-        
+
         # Classify with AI
         result = await ai_provider.classify(processed_text)
-        
+
         # Add user context
         result["user"] = current_user.username
         result["timestamp"] = datetime.utcnow().isoformat()
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(
             f"Classification error for user {current_user.username}: {e}"
@@ -147,27 +139,27 @@ async def classify_file_api(
 ):
     """
     Classify email file via API (JWT protected).
-    
+
     Requires 'classify:read' scope.
     Supports PDF and TXT files.
     """
     try:
         # Extract text from file
         text = await _extract_text(None, file)
-        
+
         # Preprocess text
         processed_text = preprocess_text(text)
-        
+
         # Classify with AI
         result = await ai_provider.classify(processed_text)
-        
+
         # Add metadata
         result["user"] = current_user.username
         result["filename"] = file.filename
         result["timestamp"] = datetime.utcnow().isoformat()
-        
+
         return result
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -187,7 +179,7 @@ async def classify_with_api_key(
 ):
     """
     Classify email text using API key authentication.
-    
+
     Legacy endpoint for systems that cannot use JWT.
     """
     try:
@@ -196,19 +188,19 @@ async def classify_with_api_key(
                 status_code=400,
                 detail=f"Text exceeds limit of {settings.max_input_chars}"
             )
-        
+
         # Preprocess text
         processed_text = preprocess_text(request.text)
-        
+
         # Classify with AI
         result = await ai_provider.classify(processed_text)
-        
+
         # Add metadata
         result["auth_method"] = "api_key"
         result["timestamp"] = datetime.utcnow().isoformat()
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(f"API key classification error: {e}")
         raise HTTPException(status_code=500, detail="Classification failed")
