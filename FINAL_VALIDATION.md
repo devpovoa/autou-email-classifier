@@ -30,6 +30,17 @@ detail=f"Texto excede o limite de {
 detail=f"Texto excede o limite de {settings.max_input_chars} caracteres",
 ```
 
+#### 1.2. **app/web/routes.py** - Linha 331  
+**Problema**: Outra string literal não terminada em f-string
+```python
+# ANTES (QUEBRADO)
+detail=f"Arquivo muito grande (máximo: {
+    settings.max_file_size // 1024 // 1024}MB)",
+
+# DEPOIS (CORRIGIDO)
+detail=f"Arquivo muito grande (máximo: {settings.max_file_size // 1024 // 1024}MB)",
+```
+
 #### 2. **app/services/ai.py** - Linha 121
 **Problema**: Conflito de aspas em JSON dentro de f-string
 ```python  
@@ -59,6 +70,7 @@ detail=f"Texto excede o limite de {settings.max_input_chars} caracteres",
 **Commits de Correção**:
 1. **d374f6f** - "fix: resolve critical syntax errors in routes.py and ai.py"
 2. **c886c10** - "fix: resolve f-string format specifier conflicts in prompt_templates.py"
+3. **ad86553** - "fix: resolve additional syntax error in routes.py line 331"
 
 ---
 
