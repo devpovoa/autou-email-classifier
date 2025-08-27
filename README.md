@@ -325,23 +325,32 @@ Logs em formato JSON estruturado para fácil integração com ferramentas de mon
 
 ## 🔄 Próximos Passos
 
-### Funcionalidades Planejadas
-- [ ] Autenticação e contas de usuário
-- [ ] Histórico persistente no servidor
-- [ ] Suporte a múltiplos idiomas
-- [ ] API REST completa com autenticação
-- [ ] Dashboard administrativo
-- [ ] Integração com sistemas de e-mail (IMAP/POP3)
-- [ ] OCR para PDFs escaneados
-- [ ] Treinamento de modelo personalizado
+### ✅ Funcionalidades Já Implementadas
+- [x] **Autenticação JWT** - Sistema completo com tokens seguros
+- [x] **API REST com autenticação** - Endpoints `/api/classify/*` protegidos
+- [x] **Testes de carga** - Suite de testes de performance implementada
+- [x] **Pipeline CI/CD** - GitHub Actions configurado
+- [x] **Logs estruturados** - Sistema de logging JSON implementado
+- [x] **Documentação OpenAPI** - Swagger/ReDoc disponíveis
+- [x] **Containerização Docker** - Multi-stage build otimizado
 
-### Melhorias Técnicas
-- [ ] Cache Redis para respostas frequentes
-- [ ] Background tasks com Celery
-- [ ] Métricas com Prometheus
-- [ ] Testes de carga
-- [ ] Pipeline CI/CD
-- [ ] Backup automático de dados
+### 🚧 Funcionalidades Planejadas
+- [ ] **Histórico persistente no servidor** (atualmente apenas local)
+- [ ] **Suporte a múltiplos idiomas** (otimizado para português)
+- [ ] **Dashboard administrativo** com métricas avançadas
+- [ ] **Integração com sistemas de e-mail** (IMAP/POP3)
+- [ ] **OCR para PDFs escaneados** (apenas texto extraível)
+- [ ] **Treinamento de modelo personalizado**
+- [ ] **Sistema de usuários múltiplos** (atualmente admin único)
+
+### 🔧 Melhorias Técnicas Planejadas
+- [ ] **Cache Redis** para respostas frequentes
+- [ ] **Background tasks** com Celery para processamento assíncrono
+- [ ] **Métricas com Prometheus** e Grafana
+- [ ] **Backup automático** de dados e configurações
+- [ ] **Rate limiting** mais avançado por usuário
+- [ ] **Health checks** mais detalhados
+- [ ] **Monitoramento APM** (Application Performance Monitoring)
 
 ## 🤝 Contribuição
 
