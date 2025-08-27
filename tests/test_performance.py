@@ -36,9 +36,7 @@ class TestPerformance:
             mock_reply.return_value = "Resposta automática"
 
             start_time = time.time()
-            _ = client.post(
-                "/classify", data={"text": text, "tone": "neutro"}
-            )  # unused
+            response = client.post("/classify", data={"text": text, "tone": "neutro"})
             end_time = time.time()
 
             response_time = (end_time - start_time) * 1000  # em ms
@@ -99,7 +97,7 @@ class TestPerformance:
             mock_reply.return_value = "Processado com sucesso"
 
             start_time = time.time()
-            _ = client.post(  # unused
+            response = client.post(
                 "/classify", data={"text": large_text, "tone": "neutro"}
             )
             end_time = time.time()
@@ -136,7 +134,7 @@ class TestPerformance:
                         "text/plain",
                     )
                 }
-                _ = client.post(  # unused
+                response = client.post(  # unused
                     "/classify", data={"tone": "neutro"}, files=files
                 )
 
@@ -171,9 +169,9 @@ class TestScalability:
             mock_classify.side_effect = Exception("API Error")
 
             start_time = time.time()
-            _ = client.post(
+            response = client.post(
                 "/classify", data={"text": text, "tone": "neutro"}
-            )  # unused
+            )
             end_time = time.time()
 
             fallback_time = (end_time - start_time) * 1000
@@ -199,7 +197,7 @@ class TestRobustness:
         ]
 
         for malformed_input in malformed_inputs:
-            _ = client.post("/classify", data=malformed_input)  # unused
+            response = client.post("/classify", data=malformed_input)
             # Deve retornar erro 400 para input inválido
             assert response.status_code == 400
 
@@ -228,7 +226,7 @@ class TestRobustness:
             mock_reply.return_value = "Processado"
 
             for special_text in special_texts:
-                _ = client.post(  # unused
+                response = client.post(  # unused
                     "/classify", data={"text": special_text, "tone": "neutro"}
                 )
 
@@ -239,15 +237,13 @@ class TestRobustness:
         """Testa valores limítrofes"""
         # Texto no limite exato
         limit_text = "a" * 5000  # Exatamente o limite
-        _ = client.post(
-            "/classify", data={"text": limit_text, "tone": "neutro"}
-        )  # unused
+        response = client.post("/classify", data={"text": limit_text, "tone": "neutro"})
         # Pode dar 200 ou 400, mas não deve quebrar
         assert response.status_code in [200, 400]
 
         # Texto 1 char acima do limite
         over_limit_text = "a" * 5001
-        _ = client.post(  # unused
+        response = client.post(  # unused
             "/classify", data={"text": over_limit_text, "tone": "neutro"}
         )
         assert response.status_code == 400
@@ -287,7 +283,7 @@ class TestResourceUsage:
                 }
                 mock_reply.return_value = f"Resposta {i}"
 
-                _ = client.post(  # unused
+                response = client.post(
                     "/classify", data={"text": text, "tone": "neutro"}
                 )
 
@@ -326,7 +322,7 @@ class TestResourceUsage:
                 }
                 mock_reply.return_value = "Resposta"
 
-                _ = client.post(  # unused
+                response = client.post(
                     "/classify",
                     data={"text": f"Teste CPU {i}" * 100, "tone": "neutro"},
                 )
@@ -338,4 +334,5 @@ class TestResourceUsage:
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    # pytest.main([__file__, "-v"])
+    pass

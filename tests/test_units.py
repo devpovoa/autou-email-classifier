@@ -146,9 +146,9 @@ class TestHeuristicsUnits:
 
 
 class TestAIProviderUnits:
-    """Testes unitários para o provedor de IA"""
+    """Testa funcionalidades específicas do AIProvider"""
 
-    def setUp(self):
+    def setup_method(self):
         self.ai_provider = AIProvider()
 
     @pytest.mark.asyncio
@@ -177,7 +177,7 @@ class TestAIProviderUnits:
             )
 
             _ = AIProvider()  # unused
-            result = await ai_provider._classify_openai("Preciso de ajuda")
+            result = await self.ai_provider._classify_openai("Preciso de ajuda")
 
             assert result["category"] == "Produtivo"
             assert result["rationale"] == "Solicitação de suporte"
@@ -198,7 +198,7 @@ class TestAIProviderUnits:
             _ = AIProvider()  # unused
 
             # Deve usar fallback heurístico
-            result = await ai_provider.classify("Preciso de suporte técnico")
+            result = await self.ai_provider.classify("Preciso de suporte técnico")
             assert result["meta"]["fallback"] is True
             assert result["category"] in ["Produtivo", "Improdutivo"]
 
@@ -220,7 +220,7 @@ class TestAIProviderUnits:
             )
 
             _ = AIProvider()  # unused
-            result = await ai_provider._classify_openai("Teste")
+            result = await self.ai_provider._classify_openai("Teste")
 
             # Deve retornar resposta padrão para JSON inválido
             assert result["category"] == "Produtivo"
@@ -244,7 +244,7 @@ class TestAIProviderUnits:
             )
 
             _ = AIProvider()  # unused
-            reply = await ai_provider._generate_reply_openai(
+            reply = await self.ai_provider._generate_reply_openai(
                 "Preciso de ajuda", "Produtivo", "formal"
             )
 
@@ -254,7 +254,7 @@ class TestAIProviderUnits:
     def test_generate_reply_fallback_productive_formal(self):
         """Testa resposta fallback para email produtivo formal"""
         _ = AIProvider()  # unused
-        reply = ai_provider._generate_reply_fallback("Produtivo", "formal")
+        reply = self.ai_provider._generate_reply_fallback("Produtivo", "formal")
 
         assert "Prezado" in reply
         assert "solicitação" in reply.lower()
@@ -263,7 +263,7 @@ class TestAIProviderUnits:
     def test_generate_reply_fallback_improdutive_amigavel(self):
         """Testa resposta fallback para email improdutivo amigável"""
         _ = AIProvider()  # unused
-        reply = ai_provider._generate_reply_fallback("Improdutivo", "amigavel")
+        reply = self.ai_provider._generate_reply_fallback("Improdutivo", "amigavel")
 
         assert "😊" in reply
         assert "obrigado" in reply.lower() or "legal" in reply.lower()
@@ -273,7 +273,7 @@ class TestAIProviderUnits:
         _ = AIProvider()  # unused
         usage = {"prompt_tokens": 100, "completion_tokens": 50}
 
-        cost = ai_provider._estimate_cost(usage)
+        cost = self.ai_provider._estimate_cost(usage)
         assert cost > 0
         assert isinstance(cost, float)
         assert cost < 1  # Deve ser valor pequeno
