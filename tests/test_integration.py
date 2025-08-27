@@ -107,7 +107,10 @@ class TestUploadIntegration:
                 result = response.json()
                 assert result["category"] == "Improdutivo"
                 # Check reply content (mock returns structured response)
-        assert "obrigado" in result["reply"].lower() or "obrigad" in result["reply"].lower()
+        assert (
+            "obrigado" in result["reply"].lower()
+            or "obrigad" in result["reply"].lower()
+        )
 
 
 class TestFullWorkflowIntegration:
