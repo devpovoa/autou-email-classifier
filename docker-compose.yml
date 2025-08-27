@@ -74,15 +74,17 @@ services:
       target: development
     volumes:
       - .:/app
+    environment:
+      - PATH=/home/app/.local/bin:/usr/local/bin:/usr/bin:/bin
     command: |
       sh -c "
-        pip install flake8 black isort &&
+        pip install --user flake8 black isort &&
         echo '=== Running Black ===' &&
-        black --check app/ tests/ main.py &&
+        ~/.local/bin/black --check app/ tests/ main.py &&
         echo '=== Running isort ===' &&
-        isort --check-only app/ tests/ main.py &&
+        ~/.local/bin/isort --profile black --check-only app/ tests/ main.py &&
         echo '=== Running flake8 ===' &&
-        flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503
+        ~/.local/bin/flake8 app/ tests/ main.py --max-line-length=88 --extend-ignore=E203,W503
       "
     profiles:
       - lint

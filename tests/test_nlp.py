@@ -1,3 +1,5 @@
+import pytest
+
 from app.services.nlp import (
     clean_text,
     detect_language,

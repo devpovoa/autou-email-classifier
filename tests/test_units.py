@@ -4,7 +4,9 @@ Testa componentes individuais: NLP, AI, utils, heuristics
 """
 
 import json
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
+
+import pytest
 
 from app.services.ai import AIProvider
 from app.services.heuristics import classify_heuristic, get_classification_confidence
@@ -368,7 +370,6 @@ class TestLoggingUnits:
 
     def test_structured_logger_json_output(self):
         """Testa saída JSON do logger"""
-        import logging
 
         from app.core.logger import StructuredLogger
 
