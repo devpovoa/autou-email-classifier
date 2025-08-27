@@ -1,5 +1,9 @@
-from app.services.nlp import (clean_text, detect_language, extract_keywords,
-                              preprocess_text)
+from app.services.nlp import (
+    clean_text,
+    detect_language,
+    extract_keywords,
+    preprocess_text,
+)
 
 
 @pytest.mark.asyncio

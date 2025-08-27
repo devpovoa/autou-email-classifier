@@ -1,5 +1,4 @@
-from app.services.heuristics import (classify_heuristic,
-                                     get_classification_confidence)
+from app.services.heuristics import classify_heuristic, get_classification_confidence
 
 
 def test_classify_heuristic():

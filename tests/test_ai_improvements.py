@@ -5,8 +5,11 @@ Testes das melhorias de IA - Demonstra ajuste e otimização da IA
 import pytest
 
 from app.services.ai import ai_provider
-from app.services.prompt_templates import (PromptOptimizer, PromptTemplates,
-                                           prompt_optimizer)
+from app.services.prompt_templates import (
+    PromptOptimizer,
+    PromptTemplates,
+    prompt_optimizer,
+)
 
 
 class TestPromptOptimization:

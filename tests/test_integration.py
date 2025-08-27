@@ -43,9 +43,10 @@ class TestUploadIntegration:
         txt_content = "Preciso de suporte urgente para resolver problema no sistema"
         txt_bytes = txt_content.encode("utf-8")
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             # Mock das respostas da IA
             mock_classify.return_value = {
@@ -87,9 +88,10 @@ class TestUploadIntegration:
         """Testa inserção direta de texto"""
         text = "Parabéns pelo excelente trabalho realizado pela equipe!"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Improdutivo",
@@ -209,9 +211,10 @@ class TestNLPIntegration:
         Enviado do meu iPhone
         """
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -262,9 +265,10 @@ class TestAPIIntegration:
         email_text = "Preciso verificar o status do meu pedido"
 
         for tone in ["formal", "neutro", "amigavel"]:
-            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-                "app.services.ai.ai_provider.generate_reply"
-            ) as mock_reply:
+            with (
+                patch("app.services.ai.ai_provider.classify") as mock_classify,
+                patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+            ):
 
                 mock_classify.return_value = {
                     "category": "Produtivo",

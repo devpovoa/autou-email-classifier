@@ -22,9 +22,10 @@ class TestPerformance:
         """Testa tempo de resposta para classificação única"""
         text = "Preciso de ajuda com problema no sistema"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -54,9 +55,10 @@ class TestPerformance:
         """Testa manipulação de requisições concorrentes"""
         text = "Teste de concorrência"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -83,9 +85,10 @@ class TestPerformance:
         # Texto próximo ao limite (4500 chars)
         large_text = "Este é um texto longo para testar performance. " * 90
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -111,9 +114,10 @@ class TestPerformance:
         """Testa uso de memória com múltiplos arquivos"""
         file_content = "Conteúdo de teste para arquivo " * 100
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -210,9 +214,10 @@ class TestRobustness:
             "Texto com    espaços    extras",
         ]
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -265,9 +270,10 @@ class TestResourceUsage:
         for i in range(10):
             text = f"Teste de memória número {i} " * 50
 
-            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-                "app.services.ai.ai_provider.generate_reply"
-            ) as mock_reply:
+            with (
+                patch("app.services.ai.ai_provider.classify") as mock_classify,
+                patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+            ):
 
                 mock_classify.return_value = {
                     "category": "Produtivo",
@@ -303,9 +309,10 @@ class TestResourceUsage:
 
         # Fazer várias requisições
         for i in range(5):
-            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-                "app.services.ai.ai_provider.generate_reply"
-            ) as mock_reply:
+            with (
+                patch("app.services.ai.ai_provider.classify") as mock_classify,
+                patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+            ):
 
                 mock_classify.return_value = {
                     "category": "Produtivo",

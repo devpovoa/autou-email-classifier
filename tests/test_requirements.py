@@ -50,9 +50,10 @@ class TestRequisitoInterfaceWeb:
         """Testa se categoria é exibida nos resultados"""
         text = "Preciso de suporte técnico urgente"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -75,9 +76,10 @@ class TestRequisitoInterfaceWeb:
         """Testa se resposta automática é exibida"""
         text = "Obrigado pelo excelente atendimento!"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Improdutivo",
@@ -106,9 +108,10 @@ class TestRequisitoBackendPython:
         email_content = "Preciso de ajuda com problema no sistema"
         txt_bytes = email_content.encode("utf-8")
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -141,8 +144,7 @@ class TestRequisitoBackendPython:
 
     def test_preprocessamento_nlp(self):
         """Testa técnicas de NLP (remoção de stop words, processamento)"""
-        from app.services.nlp import (clean_text, extract_keywords,
-                                      preprocess_text)
+        from app.services.nlp import clean_text, extract_keywords, preprocess_text
 
         # Texto com elementos que devem ser removidos/processados
         messy_text = """
@@ -174,9 +176,10 @@ class TestRequisitoBackendPython:
         # Teste email produtivo
         email_produtivo = "Estou com problema no sistema e preciso de suporte urgente"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -197,9 +200,10 @@ class TestRequisitoBackendPython:
         # Teste email improdutivo
         email_improdutivo = "Parabéns pelo excelente trabalho da equipe!"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Improdutivo",
@@ -269,9 +273,10 @@ class TestRequisitoBackendPython:
         """Testa geração de resposta usando API de AI"""
         text = "Preciso redefinir minha senha de acesso"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -357,9 +362,10 @@ class TestRequisitoIntegracaoWeb:
     def test_exibicao_resultados_frontend(self):
         """Testa se resultados são formatados corretamente para exibição"""
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Produtivo",
@@ -450,9 +456,10 @@ class TestRequisitosFuncionaisEspecíficos:
 
         direct_text = "Email inserido diretamente na interface sem arquivo"
 
-        with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-            "app.services.ai.ai_provider.generate_reply"
-        ) as mock_reply:
+        with (
+            patch("app.services.ai.ai_provider.classify") as mock_classify,
+            patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+        ):
 
             mock_classify.return_value = {
                 "category": "Improdutivo",
@@ -481,9 +488,10 @@ class TestRequisitosFuncionaisEspecíficos:
         ]
 
         for text, expected_category in test_cases:
-            with patch("app.services.ai.ai_provider.classify") as mock_classify, patch(
-                "app.services.ai.ai_provider.generate_reply"
-            ) as mock_reply:
+            with (
+                patch("app.services.ai.ai_provider.classify") as mock_classify,
+                patch("app.services.ai.ai_provider.generate_reply") as mock_reply,
+            ):
 
                 mock_classify.return_value = {
                     "category": expected_category,

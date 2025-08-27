@@ -7,11 +7,15 @@ import json
 from unittest.mock import AsyncMock, Mock, patch
 
 from app.services.ai import AIProvider
-from app.services.heuristics import (classify_heuristic,
-                                     get_classification_confidence)
+from app.services.heuristics import classify_heuristic, get_classification_confidence
+
 # Import das classes a serem testadas
-from app.services.nlp import (clean_text, detect_language, extract_keywords,
-                              preprocess_text)
+from app.services.nlp import (
+    clean_text,
+    detect_language,
+    extract_keywords,
+    preprocess_text,
+)
 from app.utils.pdf import extract_text_from_pdf, validate_pdf
 from app.utils.txt import extract_text_from_txt, validate_txt
 
@@ -148,9 +152,10 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_openai_success(self):
         """Testa classificação OpenAI com sucesso"""
-        with patch("app.services.ai.settings.openai_api_key", "test_key"), patch(
-            "httpx.AsyncClient"
-        ) as mock_client:
+        with (
+            patch("app.services.ai.settings.openai_api_key", "test_key"),
+            patch("httpx.AsyncClient") as mock_client,
+        ):
             # Mock da resposta da API
             mock_response = Mock()
             mock_response.status_code = 200
@@ -198,9 +203,10 @@ class TestAIProviderUnits:
     @pytest.mark.asyncio
     async def test_classify_invalid_json_response(self):
         """Testa resposta JSON inválida da OpenAI"""
-        with patch("app.services.ai.settings.openai_api_key", "test_key"), patch(
-            "httpx.AsyncClient"
-        ) as mock_client:
+        with (
+            patch("app.services.ai.settings.openai_api_key", "test_key"),
+            patch("httpx.AsyncClient") as mock_client,
+        ):
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {

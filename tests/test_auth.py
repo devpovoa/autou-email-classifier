@@ -8,9 +8,14 @@ import pytest
 from fastapi.testclient import TestClient
 from jose import jwt
 
-from app.core.auth import (authenticate_user, create_access_token,
-                           generate_api_key, hash_api_key, rate_limiter,
-                           verify_token)
+from app.core.auth import (
+    authenticate_user,
+    create_access_token,
+    generate_api_key,
+    hash_api_key,
+    rate_limiter,
+    verify_token,
+)
 from app.core.config import settings
 from main import app
 
