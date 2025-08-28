@@ -13,23 +13,23 @@ Sistema que **classifica e responde** e-mails corporativos (Produtivo × Improdu
 
 🔗 **[Acesse em produção](https://autou-email-classifier-xuy3.onrender.com/)**
 
-[🎯 Contexto](#contexto-do-desafio) •
-[📊 Critérios](#critérios-de-avaliação--cobertura) •
-[🖼️ Demo](#demo) •
-[⚡ Quickstart](#quickstart) •
-[🏗️ Arquitetura](#arquitetura) •
-[🔐 Segurança](#seguranca) •
-[📡 API](#api-reference) •
-[🧪 Testes](#testes--qualidade) •
-[🚀 Deploy](#deploy--monitoramento) •
-[⚙️ Variáveis](#variáveis-de-ambiente) •
-[🛣️ Roadmap](#roadmap--contribuição) •
-[📄 Licença](#licença) •
-[👥 Autor](#autor) •
+[🎯 Contexto](#toc-contexto) •
+[📊 Critérios](#toc-criterios) •
+[🖼️ Demo](#toc-demo) •
+[⚡ Quickstart](#toc-quickstart) •
+[🏗️ Arquitetura](#toc-arquitetura) •
+[🔐 Segurança](#toc-seguranca) •
+[📡 API](#toc-api) •
+[🧪 Testes](#toc-testes) •
+[🚀 Deploy](#toc-deploy) •
+[⚙️ Variáveis](#toc-variaveis) •
+[🛣️ Roadmap](#toc-roadmap) •
+[📄 Licença](#toc-licenca) •
+[👥 Autor](#toc-autor) •
 </div>
 
 ---
-
+<a id="toc-contexto"></a>
 ## 📌 Contexto do Desafio
 
 Empresas do setor financeiro recebem **milhares de e-mails por dia**. Parte desses e-mails exige ação imediata (ex.: solicitações de suporte, status de casos em aberto), enquanto outros são improdutivos (ex.: felicitações, mensagens irrelevantes).
@@ -82,7 +82,7 @@ Minha implementação do **AutoU Email Classifier** entrega uma aplicação **ro
 
 
 > ℹ️ Observação: o código tem stubs para `HF` (Hugging Face) como **possibilidade futura de integração**, porém **não há uso de `transformers`** no ambiente atual — quando `provider="HF"`, a implementação retorna o **fallback heurístico**.
-
+<a id="toc-demo"></a>
 ## 🖼️ Demo
 
 <p align="center">
@@ -141,7 +141,7 @@ Quando a IA não está disponível, a decisão é tomada por **regras ponderadas
 - Caso contrário → `Improdutivo` (conf. ~0.5).
 
 > Isso garante **continuidade do serviço** mesmo sem a IA, mantendo um comportamento previsível e audível.
-
+<a id="toc-criterios"></a>
 ## 📊 Critérios de Avaliação — Cobertura
 
 | Critério                        | Status | Destaques                                                                 |
@@ -159,7 +159,7 @@ Quando a IA não está disponível, a decisão é tomada por **regras ponderadas
 - 🚀 Deploy production-like mesmo no plano gratuito do Render
 - 🧪 Testes automatizados com 58% coverage
 - 🎨 Interface premium com dark mode e dashboard de métricas
-
+<a id="toc-quickstart"></a>
 ## ⚡ Quickstart
 
 ### ✅ Pré-requisitos
@@ -297,6 +297,7 @@ flake8 app/ tests/ main.py --max-line-length=88
 # Logs (Docker)
 docker logs -f autou-email-classifier_app_1
 ```
+<a id="toc-arquitetura"></a>
 ## 🏗️ Arquitetura
 
 ### Visão Geral em Camadas
@@ -420,7 +421,7 @@ autou-email-classifier/
 
 Bora, mestre! 🚀
 Entramos na **ETAPA 9 — Segurança**. Objetivo: deixar claro pro avaliador que sua aplicação é **pensada para produção** (autenticação, limites, sanitização, timeouts, CORS, segredos). Tudo em bloco **copiar-e-colar**.
-
+<a id="toc-seguranca"></a>
 ## 🔐 Segurança
 
 A aplicação foi projetada com **práticas de segurança** adequadas a ambiente de produção, mesmo rodando no **plano gratuito** do Render.
@@ -520,7 +521,7 @@ MAX_FILE_SIZE=2097152
 
 Show de bola 👊 você trouxe o **Swagger UI** com todas as rotas expostas.
 Isso já é meio caminho andado para a **ETAPA 10 — API Reference**, porque o avaliador vai querer uma listinha rápida (copiar e colar) sem precisar abrir o Swagger.
-
+<a id="toc-api"></a>
 ## 📡 API Reference
 
 A API segue o padrão REST com autenticação **JWT** (exceto rotas públicas).
@@ -608,7 +609,7 @@ Form-data:
 ```json
 "Oi! 😊 Sua mensagem foi recebida e vamos acompanhar em breve..."
 ```
-
+<a id="toc-testes"></a>
 ## 🧪 Testes & Qualidade
 
 > Suite de testes focada nas camadas **services** (IA/heurística/NLP), **core** (auth/config/logger) e **web** (rotas).
@@ -676,7 +677,7 @@ flake8 app/ tests/ main.py --max-line-length=88
   * (Opcional) Build Docker
 * Status do pipeline exibido no PR (protege `main`)
 
-
+<a id="toc-deploy"></a>
 ## 🚀 Deploy & Monitoramento
 
 ### 🌐 Hospedagem
@@ -759,7 +760,7 @@ curl https://SEU-LINK-RENDER.onrender.com/metrics
 Perfeito 🚀 Bora de **ETAPA 13 — Variáveis de Ambiente**.
 Essa etapa serve para o avaliador bater o olho e saber **como configurar o `.env`** sem ficar caçando em código.
 Vou te passar em formato pronto para README: exemplo `.env` + tabela de referência.
-
+<a id="toc-variaveis"></a>
 ## ⚙️ Variáveis de Ambiente
 
 A aplicação utiliza um arquivo `.env` para configuração.
@@ -826,6 +827,7 @@ CONFIDENCE_THRESHOLD=0.7           # Confiança mínima para IA
 | `USE_HEURISTIC_FALLBACK`          | `true`        | Ativa fallback heurístico                                  |
 | `CONFIDENCE_THRESHOLD`            | `0.7`         | Score mínimo de confiança para aceitar resposta da IA      |
 
+<a id="toc-roadmap"></a>
 ## 🛣️ Roadmap & Contribuição
 📚 Veja também: [CONTRIBUTING.md](CONTRIBUTING.md) para o guia completo de contribuição.
 
@@ -886,12 +888,14 @@ CONFIDENCE_THRESHOLD=0.7           # Confiança mínima para IA
 * [ ] Documentação atualizada (README, comentários, docstrings)
 * [ ] Mensagens de commit no formato correto
 
+<a id="toc-licenca"></a>
 ## 📄 Licença
 
 📄 Licença: Este projeto está sob a **Licença MIT** – veja [LICENSE](LICENSE)
 
 📖 Histórico de mudanças: disponível em [CHANGELOG.md](CHANGELOG.md)
 
+<a id="toc-autor"></a>
 ## 👥 Autor
 
 **Thiago Povoa (DevPovoa)**
