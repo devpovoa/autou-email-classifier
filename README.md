@@ -369,8 +369,6 @@ MAX_FILE_SIZE=2097152              # 2MB
 AI_TIMEOUT=30
 RATE_LIMIT_REQUESTS=100
 ```
-
-### Observabilidade
 ### Observabilidade
 - **Logging estruturado** (JSON) com contexto completo
 - **Auditoria**: eventos críticos logados com metadata
@@ -424,46 +422,6 @@ POST /api/refine
 }
 ```
 
-<a id="toc-testes"></a>
-## 🧪 Testes & Qualidade
-
-* **Rate limiting** por usuário (ex.: 100 req/hora) → mitiga abuso e custos com AI.
-* **Timeouts** em chamadas externas de IA (padrão: 30s) → evita requisições “presas”.
-* **Backoff** lógico via fallback: se IA falhar (401/429/5xx) → **heurística** assume.
-
-### Validação & Sanitização de Inputs
-
-* **Tamanho máximo**: 5MB para arquivos e 5.000 caracteres para texto (configurável).
-* **Tipos permitidos**: `.pdf` e `.txt` (checagem de content-type + assinatura).
-* **Sanitização**: remoção de scripts/conteúdos maliciosos antes do processamento.
-* **Pré-processamento NLP**: normalização de texto reduz risco de injeções inesperadas.
-
-### Segredos & Configuração
-
-* **Sem secrets no repositório**. Tudo via `.env`:
-
-```env
-JWT_SECRET_KEY=troque-esta-chave
-OPENAI_API_KEY=sk-...
-PROVIDER=OpenAI            # vazio = só heurística
-MODEL_NAME=gpt-4o-mini
-LOG_LEVEL=INFO
-AI_TIMEOUT=30
-RATE_LIMIT_REQUESTS=100
-RATE_LIMIT_WINDOW=3600
-MAX_INPUT_CHARS=5000
-MAX_FILE_SIZE=2097152
-```
-
-* **Rotação de chaves JWT** recomendada em releases sensíveis
-* **Variáveis sensíveis** configuradas no painel de deploy (Environment Variables)
-
-### Observabilidade & Logs
-
-* ### Observabilidade
-- **Logging estruturado** (JSON) com contexto completo
-- **Auditoria**: eventos críticos logados com metadata
-- **Sem persistência sensível** (estateless-friendly)
 
 <a id="toc-testes"></a>
 ## 🧪 Testes & Qualidade
@@ -538,12 +496,6 @@ docker logs -f autou-classifier
    ```
 5. **Faça push**: `git push origin feature/nova-funcionalidade`
 6. **Abra um Pull Request**
-
-### ✅ Checklist de PR
-- [ ] Código segue padrões do projeto
-- [ ] Testes passando e cobertura mantida
-- [ ] Documentação atualizada
-- [ ] Mensagens de commit no formato correto
 
 <a id="toc-licenca"></a>
 ## 📄 Licença
