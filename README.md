@@ -449,8 +449,6 @@ autou-email-classifier/
 - **httpx Async** para chamadas externas com timeout → menor latência e controle de erro.
 - **Render Free Tier**: 512MB / 0.1 CPU; pode haver **cold start** após inatividade.
 
-Bora, mestre! 🚀
-Entramos na **ETAPA 9 — Segurança**. Objetivo: deixar claro pro avaliador que sua aplicação é **pensada para produção** (autenticação, limites, sanitização, timeouts, CORS, segredos). Tudo em bloco **copiar-e-colar**.
 <a id="toc-seguranca"></a>
 ## 🔐 Segurança
 
@@ -549,8 +547,6 @@ MAX_FILE_SIZE=2097152
 * [x] **CORS** configurado para origens confiáveis em produção
 * [x] **Fallback** heurístico garante disponibilidade mesmo sem IA
 
-Show de bola 👊 você trouxe o **Swagger UI** com todas as rotas expostas.
-Isso já é meio caminho andado para a **ETAPA 10 — API Reference**, porque o avaliador vai querer uma listinha rápida (copiar e colar) sem precisar abrir o Swagger.
 <a id="toc-api"></a>
 ## 📡 API Reference
 
@@ -787,9 +783,6 @@ curl https://SEU-LINK-RENDER.onrender.com/metrics
 * Erros de IA (401, 429, 5xx) registrados com contexto
 * Fallback heurístico garantido → nunca retorna 500 ao usuário final
 
-Perfeito 🚀 Bora de **ETAPA 13 — Variáveis de Ambiente**.
-Essa etapa serve para o avaliador bater o olho e saber **como configurar o `.env`** sem ficar caçando em código.
-Vou te passar em formato pronto para README: exemplo `.env` + tabela de referência.
 <a id="toc-variaveis"></a>
 ## ⚙️ Variáveis de Ambiente
 
