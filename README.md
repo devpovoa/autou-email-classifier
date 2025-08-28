@@ -13,19 +13,19 @@ Sistema que **classifica e responde** e-mails corporativos (Produtivo × Improdu
 
 🔗 **[Acesse em produção](https://autou-email-classifier-xuy3.onrender.com/)**
 
-[🎯 Contexto](#-contexto-do-desafio) •
-[📊 Critérios](#-critérios-de-avaliação) •
-[🖼️ Demo](#-demo) •
-[⚡ Quickstart](#-quickstart) •
-[🏗️ Arquitetura](#-arquitetura) •
-[🔐 Segurança](#-segurança) •
-[📡 API](#-api-reference) •
-[🧪 Testes](#-testes--qualidade) •
-[🚀 Deploy](#-deploy--monitoramento) •
-[⚙️ Variáveis](#-variáveis-de-ambiente) •
-[🛣️ Roadmap](#-roadmap--contribuição) •
-[📄 Licença](#-licença) •
-[👥 Autor](#-autor) •
+[🎯 Contexto](#contexto-do-desafio) •
+[📊 Critérios](#critérios-de-avaliação--cobertura) •
+[🖼️ Demo](#demo) •
+[⚡ Quickstart](#quickstart) •
+[🏗️ Arquitetura](#arquitetura) •
+[🔐 Segurança](#seguranca) •
+[📡 API](#api-reference) •
+[🧪 Testes](#testes--qualidade) •
+[🚀 Deploy](#deploy--monitoramento) •
+[⚙️ Variáveis](#variáveis-de-ambiente) •
+[🛣️ Roadmap](#roadmap--contribuição) •
+[📄 Licença](#licença) •
+[👥 Autor](#autor) •
 </div>
 
 ---
