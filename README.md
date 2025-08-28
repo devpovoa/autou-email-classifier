@@ -303,33 +303,47 @@ docker logs -f autou-email-classifier_app_1
 ### Visão Geral em Camadas
 
 ```mermaid
-flowchart TB
-    subgraph Frontend [Frontend]
-        A[Jinja2 + Alpine.js]
+   flowchart TB
+    %%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+    %% Frontend
+    subgraph Frontend
+        A["Jinja2 + Alpine.js"]
     end
 
-    subgraph WebLayer [FastAPI Router (Web Layer + API)]
-        B[Rotas & Controllers]
+    %% Web Layer
+    subgraph WebLayer
+        B["Rotas e Controllers - FastAPI"]
     end
 
-    subgraph ServiceLayer [Service Layer]
-        C1[AI Provider Service]
-        C2[Heuristics Service]
-        C3[NLP Service]
+    %% Service Layer
+    subgraph ServiceLayer
+        C1["AI Provider Service"]
+        C2["Heuristics Service"]
+        C3["NLP Service"]
     end
 
-    subgraph CoreLayer [Core Layer]
-        D1[Auth (JWT)]
-        D2[Config (Settings)]
-        D3[Logger]
+    %% Core Layer (agregado para reduzir arestas)
+    subgraph CoreLayer
+        D["Core: Auth JWT / Config / Logger"]
     end
 
-    subgraph UtilsLayer [Utils Layer]
-        E1[PDF Utils]
-        E2[TXT Utils]
+    %% Utils
+    subgraph UtilsLayer
+        E1["PDF Utils"]
+        E2["TXT Utils"]
     end
 
-    A --> B --> C1 & C2 & C3 --> D1 & D2 & D3 --> E1 & E2
+    %% Ligações
+    A --> B
+    B --> C1
+    B --> C2
+    B --> C3
+    C1 --> D
+    C2 --> D
+    C3 --> D
+    D --> E1
+    D --> E2
 ```
 
 ### Pastas & Responsabilidades
