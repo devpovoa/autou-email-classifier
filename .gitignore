@@ -53,6 +53,12 @@ logs/
 htmlcov/
 coverage.xml
 
+# Test Reports
+test_report.html
+test-results/
+*.xml
+junit.xml
+
 # OS
 .DS_Store
 Thumbs.db

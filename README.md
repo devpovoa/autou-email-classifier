@@ -4,8 +4,8 @@
 
 ![Python](https://img.shields.io/badge/python-v3.12+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-green.svg)
-![Coverage](https://img.shields.io/badge/coverage-58%25-yellow.svg)
-![Tests](https://img.shields.io/badge/tests-62%20passed-brightgreen.svg)
+![Coverage](https://img.shields.io/badge/coverage-87%25-yellow.svg)
+![Tests](https://img.shields.io/badge/tests-252%20passed-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 **Desafio Técnico — Desenvolvedor Python/AI**
@@ -657,8 +657,8 @@ docker compose --profile test run --rm test
 
 ### ✅ Metas atuais
 
-* **62** testes passando
-* **58%** de cobertura total (módulos críticos cobertos)
+* **252** testes passando
+* **87%** de cobertura total (módulos críticos cobertos)
 * Mocks para dependências externas (OpenAI) nos testes de serviço
 
 ### 🧰 Lint & Format
