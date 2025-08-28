@@ -306,44 +306,60 @@ docker logs -f autou-email-classifier_app_1
    flowchart TB
     %%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-    %% Frontend
+    %% Frontend (templates + JS leve)
     subgraph Frontend
-        A["Jinja2 + Alpine.js"]
+        FE["Jinja2 + Alpine.js"]
     end
 
     %% Web Layer
     subgraph WebLayer
-        B["Rotas e Controllers - FastAPI"]
+        WEB["Rotas e Controllers - FastAPI"]
+        TPL["Templates Jinja2"]
     end
 
     %% Service Layer
     subgraph ServiceLayer
-        C1["AI Provider Service"]
-        C2["Heuristics Service"]
-        C3["NLP Service"]
+        S_AI["AI Provider Service (ai.py)"]
+        S_HEU["Heuristics Service (heuristics.py)"]
+        S_NLP["NLP Service (nlp.py)"]
+        S_PROMPT["Prompt Templates (prompt_templates.py)"]
     end
 
-    %% Core Layer (agregado para reduzir arestas)
+    %% Core (cross-cutting)
     subgraph CoreLayer
-        D["Core: Auth JWT / Config / Logger"]
+        CORE["Auth JWT / Config / Logger"]
     end
 
     %% Utils
     subgraph UtilsLayer
-        E1["PDF Utils"]
-        E2["TXT Utils"]
+        U_PDF["PDF Utils (pdf.py)"]
+        U_TXT["TXT Utils (txt.py)"]
     end
 
-    %% Ligações
-    A --> B
-    B --> C1
-    B --> C2
-    B --> C3
-    C1 --> D
-    C2 --> D
-    C3 --> D
-    D --> E1
-    D --> E2
+    %% Fluxo principal
+    FE --> TPL --> WEB
+    WEB --> S_AI
+    WEB --> S_HEU
+    WEB --> S_NLP
+
+    %% Relações internas de services
+    S_AI --> S_PROMPT
+    S_NLP --> S_PROMPT
+
+    %% Utils usados por Web e Services
+    WEB --> U_PDF
+    WEB --> U_TXT
+    S_NLP --> U_TXT
+    S_NLP --> U_PDF
+
+    %% Core é transversal (config, logger, auth)
+    CORE -.-> WEB
+    CORE -.-> S_AI
+    CORE -.-> S_HEU
+    CORE -.-> S_NLP
+    CORE -.-> U_PDF
+    CORE -.-> U_TXT
+
 ```
 
 ### Pastas & Responsabilidades
