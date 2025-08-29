@@ -6,7 +6,7 @@
     <title>{% block title %}AutoU - Classificador de E-mails{% endblock %}</title>
     <meta name="description" content="Classificador inteligente de e-mails com IA - AutoU">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23007acc'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/></svg>">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -77,44 +77,44 @@
             }
         }
     </script>
-    
+
     <!-- Alpine.js Store Configuration -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('ui', {
                 showInfo: false,
-                
+
                 toggleInfo() {
                     this.showInfo = !this.showInfo;
                 },
-                
+
                 closeInfo() {
                     this.showInfo = false;
                 },
-                
+
                 openInfo() {
                     this.showInfo = true;
                 }
             });
         });
     </script>
-    
+
     <!-- Alpine.js with persist plugin -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
+
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <style>
-        body { 
+        body {
             font-family: 'Inter', sans-serif;
             font-feature-settings: 'cv11', 'ss01';
             text-rendering: optimizeLegibility;
         }
-        
+
         /* Enhanced scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -136,7 +136,7 @@
             background: linear-gradient(180deg, #475569, #334155);
             border: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         /* Enhanced file drop zone */
         .drop-zone {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -163,14 +163,14 @@
             transform: scale(1.02);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        
+
         /* Enhanced gauge */
         .gauge-fill {
             transform-origin: center;
             transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
             filter: drop-shadow(0 0 4px currentColor);
         }
-        
+
         /* Glass morphism effect */
         .glass {
             background: rgba(255, 255, 255, 0.7);
@@ -181,7 +181,7 @@
             background: rgba(17, 24, 39, 0.7);
             border: 1px solid rgba(75, 85, 99, 0.3);
         }
-        
+
         /* Enhanced button styles */
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -196,7 +196,7 @@
         .btn-primary:active {
             transform: translateY(0);
         }
-        
+
         /* Loading shimmer effect */
         @keyframes shimmer {
             0% { background-position: -200px 0; }
@@ -207,23 +207,171 @@
             background-size: 200px 100%;
             animation: shimmer 1.5s infinite;
         }
-        
+
         /* Enhanced focus styles */
         .focus-ring:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 0 0 1px #3b82f6;
         }
-        
+
         /* Custom selection */
         ::selection {
             background-color: rgba(59, 130, 246, 0.3);
             color: inherit;
         }
-        
+
         /* Smooth page transitions */
         .page-transition {
             opacity: 0;
             animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Mobile-specific improvements */
+        @media (max-width: 640px) {
+            .glass {
+                backdrop-filter: blur(8px);
+            }
+
+            /* Smaller padding for mobile */
+            .container-mobile {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            /* Better touch targets */
+            button, .btn, [role="button"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Prevent text from becoming too small */
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+
+            /* Better modal positioning on mobile */
+            .modal-mobile {
+                margin: 0.5rem;
+                max-height: calc(100vh - 1rem);
+                width: calc(100vw - 1rem);
+            }
+
+            /* Fix text overflow on mobile */
+            .truncate-mobile {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* Better button sizing on mobile */
+            .btn-mobile {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            /* Optimize grid layouts for mobile */
+            .grid-mobile-1 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+
+            /* Better spacing for mobile */
+            .space-y-mobile > * + * {
+                margin-top: 1rem;
+            }
+
+            /* Responsive text sizing */
+            .text-responsive-lg {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+
+            .text-responsive-xl {
+                font-size: 1.875rem;
+                line-height: 2.25rem;
+            }
+
+            /* Better form elements on mobile */
+            .form-mobile {
+                padding: 1rem;
+                font-size: 16px;
+            }
+        }
+
+        /* Small screens (very small phones) */
+        @media (max-width: 375px) {
+            .container-mobile {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            .modal-mobile {
+                margin: 0.25rem;
+                width: calc(100vw - 0.5rem);
+                max-height: calc(100vh - 0.5rem);
+            }
+
+            .glass {
+                padding: 1rem;
+            }
+
+            /* Even smaller text on very small screens */
+            .text-xs-mobile {
+                font-size: 0.6875rem;
+            }
+        }
+
+        /* Tablet improvements */
+        @media (min-width: 641px) and (max-width: 1023px) {
+            .container-tablet {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+
+            /* Better grid layouts for tablets */
+            .grid-tablet-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* Better hover states for touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .hover\:scale-105:hover {
+                transform: none;
+            }
+
+            .group:hover .group-hover\:scale-110 {
+                transform: none;
+            }
+        }
+
+        /* Ensure good contrast in all modes */
+        @media (prefers-contrast: high) {
+            .glass {
+                border-width: 2px;
+            }
+
+            .shadow-lg, .shadow-xl, .shadow-2xl {
+                box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.8);
+            }
+        }
+
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .animate-spin,
+            .animate-bounce,
+            .animate-pulse,
+            .animate-bounce-gentle,
+            .animate-float,
+            .animate-wiggle {
+                animation: none;
+            }
+
+            .transition-all,
+            .transition-transform,
+            .transition-colors,
+            .transition-opacity {
+                transition: none;
+            }
         }
     </style>
 
@@ -235,64 +383,65 @@
         <header class="glass sticky top-0 z-40 border-b border-white/20 dark:border-gray-700/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1 sm:flex-initial">
                         <!-- Logo with animation -->
-                        <div class="relative">
-                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg animate-float">
-                                <span class="text-white font-bold text-sm">AU</span>
+                        <div class="relative flex-shrink-0">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg animate-float">
+                                <span class="text-white font-bold text-xs sm:text-sm">AU</span>
                             </div>
-                            <div class="absolute inset-0 w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-600 rounded-xl blur-md opacity-30 animate-pulse-slow"></div>
+                            <div class="absolute inset-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-600 rounded-xl blur-md opacity-30 animate-pulse-slow"></div>
                         </div>
-                        <div>
-                            <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AutoU</h1>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Classificador Inteligente</span>
+                        <div class="min-w-0">
+                            <h1 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">AutoU</h1>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">Classificador Inteligente</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 sm:hidden">Classificador</span>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <!-- Status indicator -->
-                        <div class="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+
+                    <div class="flex items-center space-x-2 sm:space-x-4">
+                        <!-- Status indicator - hidden on very small screens -->
+                        <div class="hidden md:flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
                             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                             <span class="text-xs font-medium">Online</span>
                         </div>
-                        
+
                         <!-- Theme toggle with enhanced animation -->
-                        <button 
-                            @click="darkMode = !darkMode" 
-                            class="relative p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 group focus-ring"
+                        <button
+                            @click="darkMode = !darkMode"
+                            class="relative p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 group focus-ring flex-shrink-0"
                             :title="darkMode ? 'Modo claro' : 'Modo escuro'"
                         >
-                            <div class="relative w-5 h-5 overflow-hidden">
-                                <svg 
-                                    x-show="!darkMode" 
-                                    class="absolute inset-0 w-5 h-5 transition-all duration-500 group-hover:scale-110" 
+                            <div class="relative w-4 h-4 sm:w-5 sm:h-5 overflow-hidden">
+                                <svg
+                                    x-show="!darkMode"
+                                    class="absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 transition-all duration-500 group-hover:scale-110"
                                     :class="!darkMode ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'"
-                                    fill="none" 
-                                    stroke="currentColor" 
+                                    fill="none"
+                                    stroke="currentColor"
                                     viewBox="0 0 24 24"
                                 >
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                                 </svg>
-                                <svg 
-                                    x-show="darkMode" 
-                                    class="absolute inset-0 w-5 h-5 transition-all duration-500 group-hover:scale-110 group-hover:animate-wiggle" 
+                                <svg
+                                    x-show="darkMode"
+                                    class="absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 transition-all duration-500 group-hover:scale-110 group-hover:animate-wiggle"
                                     :class="darkMode ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'"
-                                    fill="none" 
-                                    stroke="currentColor" 
+                                    fill="none"
+                                    stroke="currentColor"
                                     viewBox="0 0 24 24"
                                 >
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                 </svg>
                             </div>
                         </button>
-                        
+
                         <!-- Info button -->
-                        <button 
+                        <button
                             @click="$store.ui.toggleInfo()"
-                            class="relative p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 group focus-ring"
+                            class="relative p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 group focus-ring flex-shrink-0"
                             title="Informações do Sistema"
                         >
-                            <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </button>
@@ -302,20 +451,20 @@
         </header>
 
         <!-- Enhanced Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 container-mobile">
             {% block content %}{% endblock %}
         </main>
-        
+
         <!-- Footer -->
         <footer class="mt-16 border-t border-gray-200/50 dark:border-gray-700/50 glass">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center md:text-left">
                         <span>© 2025 AutoU - Classificador de E-mails</span>
-                        <span class="mx-2">•</span>
-                        <span>Powered by OpenAI GPT-4o-mini</span>
+                        <span class="mx-2 hidden sm:inline">•</span>
+                        <span class="block sm:inline mt-1 sm:mt-0">Powered by OpenAI GPT-4o-mini</span>
                     </div>
-                    <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex items-center space-x-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         <div class="flex items-center space-x-1">
                             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                             <span>Sistema Operacional</span>
@@ -327,11 +476,11 @@
     </div>
 
     <!-- Enhanced Toast Container with better positioning -->
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-3 max-w-sm"></div>
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-3 max-w-sm w-full px-4 sm:px-0 sm:max-w-sm sm:w-auto"></div>
 
     <!-- Info Modal -->
-    <div 
-        x-show="$store.ui.showInfo" 
+    <div
+        x-show="$store.ui.showInfo"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -341,7 +490,7 @@
         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
         @click.self="$store.ui.closeInfo()"
     >
-        <div 
+        <div
             x-show="$store.ui.showInfo"
             x-transition:enter="transition ease-out duration-300 transform"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -349,7 +498,7 @@
             x-transition:leave="transition ease-in duration-200 transform"
             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto mx-4 sm:mx-0"
         >
             <!-- Modal Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50">
@@ -364,7 +513,7 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">Informações do Sistema</p>
                     </div>
                 </div>
-                <button 
+                <button
                     @click="$store.ui.closeInfo()"
                     class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
                 >
@@ -402,7 +551,7 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Powered by OpenAI GPT-4o-mini</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -414,7 +563,7 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Autenticação segura e rate limiting</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -426,7 +575,7 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Suporte a PDF, TXT e texto livre</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-start space-x-3">
                             <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <svg class="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,7 +643,7 @@
                     <div class="text-sm text-gray-500 dark:text-gray-400">
                         © 2025 AutoU - Classificador Inteligente de E-mails
                     </div>
-                    <button 
+                    <button
                         @click="$store.ui.closeInfo()"
                         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
                     >
